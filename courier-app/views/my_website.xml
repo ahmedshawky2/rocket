@@ -1,0 +1,120 @@
+<odoo>
+    <data>
+        <template id="order_track" name="Orders Tracking" page="True">
+            <t t-call="website.layout">
+                <div id="wrap" class="oe_structure container" style="margin-left:5%;">
+                    <h3>Please enter your order number to track it !</h3>
+                </div>
+                <div>
+                    <table style="margin-left:14%;margin-top:5%">
+                        <tr>
+                            <td>
+                                Order Number
+                            </td>
+                            <td>
+                                <form action="/orders/tracking/submit_order_tracking" name="submitorder" method="POST">
+                                    <input type="hidden" name="csrf_token" t-att-value="request.csrf_token()"/>
+                                    <input type="text" name="order_number" style="margin-left:20px;"/>
+                                    <button type="submit" value="Submit" name="submit" class="btn btn-primary"
+                                            style="margin-left:20px;">Submit
+                                    </button>
+                                </form>
+                            </td>
+                        </tr>
+                    </table>
+                </div>
+            </t>
+        </template>
+
+        <template id="order_tracking_status" name="Order Status" page="True">
+            <t t-call="website.layout">
+                <div class="oe_structure">
+                    <div class="container">
+                        <center>
+                            <h3>Order Status</h3>
+                        </center>
+                        <t t-foreach="order" t-as="_order">
+                            <h4>Order No. :
+                                <span t-esc="_order.name"/>
+                            </h4>
+                            <table class="table-striped table" style="margin-top:4%">
+                                <tr>
+                                    <td>Customer Name :</td>
+                                    <td>
+                                        <span t-esc="_order.x_Sale_Order_Customer_name"/>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>Customer Mobile :</td>
+                                    <td>
+                                        <span t-esc="_order.x_Sale_order_Mobile_No"/>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>Customer Address :</td>
+                                    <td>
+                                        <span t-esc="_order.x_sale_order_shipping_address"/>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>Product :</td>
+                                    <td>
+                                        <span t-esc="_order.x_Sale_Order_Cust_Prod"/>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>Order Cash :</td>
+                                    <td>
+                                        <span t-esc="_order.x_Sale_Order_Cash"/>
+                                        EGP
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>Driver Name :</td>
+                                    <td>
+                                        <span t-esc="driver.name"/>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>Courier Warehouse Status :</td>
+                                    <td>
+                                        <span t-esc="_order.x_Sale_Order_In_Transit_State"/>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>Customer Scheduling :</td>
+                                    <td>
+                                        <span t-esc="_order.x_Sale_Order_Scheduled_State"/>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>Expected Delivery Date :</td>
+                                    <td>
+                                        <span t-esc="_order.x_Call_Center_Date"/>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>Expected Delivery Time :</td>
+                                    <td>
+                                        From
+                                        <span t-esc="_order.x_Call_Center_Schedule_Time"/>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>Delivery Status :</td>
+                                    <td>
+                                        <span t-esc="_order.x_Sale_Order_Delivered_State"/>
+                                    </td>
+                                </tr>
+                            </table>
+                        </t>
+                        <br/>
+                        <iframe src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3453.1816931417884!2d31.342930950885936!3d30.060325981787607!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x14583e71a26b855b%3A0xc60977868a65452e!2s50+Makram+Ebeid%2C+Al+Manteqah+as+Sadesah%2C+Nasr+City%2C+Cairo+Governorate!5e0!3m2!1sen!2seg!4v1550440917702"
+                                width="1139.5" height="600" frameborder="0" style="border:0" allowfullscreen="1"></iframe>
+                    </div>
+                </div>
+            </t>
+        </template>
+
+    </data>
+</odoo>

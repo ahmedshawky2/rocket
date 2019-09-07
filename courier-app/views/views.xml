@@ -1,0 +1,60 @@
+<odoo>
+  <data>
+    <!-- explicit list view definition -->
+    <!--
+    <record model="ir.ui.view" id="courier-app.list">
+      <field name="name">courier-app list</field>
+      <field name="model">courier-app.courier-app</field>
+      <field name="arch" type="xml">
+        <tree>
+          <field name="name"/>
+          <field name="value"/>
+          <field name="value2"/>
+        </tree>
+      </field>
+    </record>
+    -->
+
+    <!-- actions opening views on models -->
+    <!--
+    <record model="ir.actions.act_window" id="courier-app.action_window">
+      <field name="name">courier-app window</field>
+      <field name="res_model">courier-app.courier-app</field>
+      <field name="view_mode">tree,form</field>
+    </record>
+    -->
+
+    <!-- server action to the one above -->
+    <!--
+    <record model="ir.actions.server" id="courier-app.action_server">
+      <field name="name">courier-app server</field>
+      <field name="model_id" ref="model_courier-app_courier-app"/>
+      <field name="state">code</field>
+      <field name="code">
+        action = {
+          "type": "ir.actions.act_window",
+          "view_mode": "tree,form",
+          "res_model": self._name,
+        }
+      </field>
+    </record>
+    -->
+
+    <!-- Top menu item -->
+    <!--
+    <menuitem name="courier-app" id="courier-app.menu_root"/>
+    -->
+    <!-- menu categories -->
+    <!--
+    <menuitem name="Menu 1" id="courier-app.menu_1" parent="courier-app.menu_root"/>
+    <menuitem name="Menu 2" id="courier-app.menu_2" parent="courier-app.menu_root"/>
+    -->
+    <!-- actions -->
+    <!--
+    <menuitem name="List" id="courier-app.menu_1_list" parent="courier-app.menu_1"
+              action="courier-app.action_window"/>
+    <menuitem name="Server to list" id="courier-app" parent="courier-app.menu_2"
+              action="courier-app.action_server"/>
+    -->
+  </data>
+</odoo>

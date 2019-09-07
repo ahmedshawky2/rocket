@@ -1,0 +1,2 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_courier-app_courier-app,courier-app.courier-app,model_courier-app_courier-app,,1,0,0,0

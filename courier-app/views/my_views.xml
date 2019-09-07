@@ -1,0 +1,2615 @@
+<odoo>
+    <data>
+
+        <record id="view_res_partners_custom" model="ir.ui.view">
+            <field name="name">res.partners.custom.form.inherited</field>
+            <field name="model">res.partner</field>
+            <field name="inherit_id" ref="base.view_partner_form"/>
+            <field name="arch" type="xml">
+                <xpath expr="//field[@name='property_payment_term_id']" position="before">
+                    <field name="partner_account_email"/>
+                    <field name="order_fees_customer_discount"/>
+                    <field name="cod_fees_discount"/>
+                    <field name="first_kilo_fees_discount"/>
+                    <field name="second_kilo_fees_discount"/>
+                    <field name="third_kilo_fees_discount"/>
+                    <field name="fourth_kilo_fees_discount"/>
+                    <field name="fifth_kilo_fees_discount"/>
+                    <field name="sunday_cod_report"/>
+                    <field name="monday_cod_report"/>
+                    <field name="tuesday_cod_report"/>
+                    <field name="wednesday_cod_report"/>
+                    <field name="thursday_cod_report"/>
+                    <field name="friday_cod_report"/>
+                    <field name="saturday_cod_report"/>
+                </xpath>
+            </field>
+        </record>
+
+        <record id="courier-app.mail_template_invoice_orders" model="mail.template">
+            <field name="name">Orders Invoices Email</field>
+            <field name="subject">${object.subject}</field>
+            <field name="model_id" ref="mail.model_mail_message"/>
+            <field name="auto_delete" eval="True"/>
+            <field name="body_html"><![CDATA[<html>
+                <head></head>
+                % set record = ctx.get('record')
+                % set company = record and record.company_id or user.company_id
+                <body style="margin: 0; padding: 0;">
+                <table border="0" width="100%" cellpadding="0" bgcolor="#ededed" style="padding: 20px; background-color: #ededed; border-collapse:separate;" summary="o_mail_notification">
+                    <tbody>
+
+                      <!-- HEADER -->
+                      <tr>
+                        <td align="center" style="min-width: 590px;">
+                          <table width="590" border="0" cellpadding="0" bgcolor="#875A7B" style="min-width: 590px; background-color: rgb(135,90,123); padding: 20px; border-collapse:separate;">
+                            <tr>
+                              <td valign="middle">
+                                  <span style="font-size:20px; color:white; font-weight: bold;">
+                                      ${object.invoice_number}
+                                  </span>
+                              </td>
+                              <td valign="middle" align="right">
+                                  <img src="/logo.png?company=${company.id}" style="padding: 0px; margin: 0px; height: auto; width: 80px;" alt="${company.name}">
+                              </td>
+                            </tr>
+                          </table>
+                        </td>
+                      </tr>
+
+                      <!-- CONTENT -->
+                      <tr>
+                        <td align="center" style="min-width: 590px;">
+                          <table width="590" border="0" cellpadding="0" bgcolor="#ffffff" style="min-width: 590px; background-color: rgb(255, 255, 255); padding: 20px; border-collapse:separate;">
+                            <tbody>
+                              <td valign="top" style="font-family:Arial,Helvetica,sans-serif; color: #555; font-size: 14px;">
+                                ${object.body | safe}
+                              </td>
+                            </tbody>
+                          </table>
+                        </td>
+                      </tr>
+
+                      <!-- FOOTER -->
+                      <tr>
+                        <td align="center" style="min-width: 590px;">
+                          <table width="590" border="0" cellpadding="0" bgcolor="#875A7B" style="min-width: 590px; background-color: rgb(135,90,123); padding: 20px; border-collapse:separate;">
+                            <tr>
+                              <td valign="middle" align="left" style="color: #fff; padding-top: 10px; padding-bottom: 10px; font-size: 12px;">
+                                ${company.name}<br/>
+                                ${company.phone or ''}
+                              </td>
+                              <td valign="middle" align="right" style="color: #fff; padding-top: 10px; padding-bottom: 10px; font-size: 12px;">
+                                % if company.email:
+                                <a href="mailto:${company.email}" style="text-decoration:none; color: white;">${company.email}</a><br/>
+                                % endif
+                                % if company.website:
+                                    <a href="${company.website}" style="text-decoration:none; color: white;">
+                                        ${company.website}
+                                    </a>
+                                % endif
+                              </td>
+                            </tr>
+                          </table>
+                        </td>
+                      </tr>
+                      <!--<tr>
+                        <td align="center">
+                            Powered by <a href="https://www.odoo.com">Odoo</a>.
+                        </td>
+                      </tr>-->
+                    </tbody>
+                </table>
+                </body>
+                </html>
+            ]]></field>
+        </record>
+
+
+        <record model="ir.ui.view" id="account_invoice_sale_tree">
+            <field name="name">account.invoice.sale.tree</field>
+            <field name="model">account.sale.invoice</field>
+            <field name="type">tree</field>
+            <field name="arch" type="xml">
+                <tree string="Account Invoice" create="true" edit="false" delete="false">
+                    <field name="partner_id" readonly="1"/>
+                    <field name="invoice_number" readonly="1"/>
+                    <field name="paid_amount_total" type="char" readonly="1" widget="monetary"
+                           options="{'currency_field': 'currency_id'}"/>
+                    <field name="order_cash_total" type="char" readonly="1" widget="monetary"
+                           options="{'currency_field': 'currency_id'}"/>
+                    <field name="orders_fees_total" type="char" readonly="1" widget="monetary"
+                           options="{'currency_field': 'currency_id'}"/>
+                    <field name="cod_fees_total" type="char" readonly="1" widget="monetary"
+                           options="{'currency_field': 'currency_id'}"/>
+                    <!--<field name="amount_vat_tax_total" readonly="1" widget="monetary" options="{'currency_field': 'currency_id'}"/>
+                    <field name="order_tax_total" readonly="1" widget="monetary" options="{'currency_field': 'currency_id'}"/>
+                    <field name="vat_tax_total" readonly="1" widget="monetary" options="{'currency_field': 'currency_id'}"/>-->
+                    <!--<field name="create_uid" readonly="1"/>-->
+                    <field name="create_date" readonly="1"/>
+                    <!--<field name="write_uid" readonly="1"/>-->
+                    <!--<field name="write_date" readonly="1"/>-->
+                    <field name="state" readonly="1"/>
+                </tree>
+            </field>
+        </record>
+
+        <record model="ir.ui.view" id="account_invoice_sale_form">
+            <field name="name">account.invoice.sale.form</field>
+            <field name="model">account.sale.invoice</field>
+            <field name="type">form</field>
+            <field name="arch" type="xml">
+                <form string="Account Invoice" create="false" edit="false" delete="false" attach="true">
+                    <header>
+                        <button name="action_mail_invoice_send" string="Send Invoice by Email" type="object"
+                                class="btn-primary"/>
+                        <button name="invoice_paid" string="Invoice Paid" type="object" class="btn-primary"
+                                attrs="{'invisible':[('state','!=','approved')]}"/>
+                        <field name="state" widget="statusbar"/>
+                    </header>
+                    <sheet>
+                        <div class="oe_title">
+                            <h1>
+                                Invoice #
+                                <field name="invoice_number" readonly="1"/>
+                                <!--<field name="img_attach" />-->
+                            </h1>
+                        </div>
+                        <group>
+                            <group>
+                                <field name="partner_id"/>
+                                <field name="invoice_count" readonly="1"/>
+                                <field name="create_uid" readonly="1"/>
+                                <field name="create_date" readonly="1"/>
+                                <field name="write_uid" readonly="1"/>
+                                <field name="write_date" readonly="1"/>
+                            </group>
+                            <group>
+                                <field name="paid_amount_total" readonly="1" widget="monetary"
+                                       options="{'currency_field': 'currency_id'}"/>
+                                <field name="order_cash_total" readonly="1" widget="monetary"
+                                       options="{'currency_field': 'currency_id'}"/>
+                                <field name="orders_fees_total" readonly="1" widget="monetary"
+                                       options="{'currency_field': 'currency_id'}"/>
+                                <field name="cod_fees_total" readonly="1" widget="monetary"
+                                       options="{'currency_field': 'currency_id'}"/>
+                                <field name="amount_vat_tax_total" readonly="1" widget="monetary"
+                                       options="{'currency_field': 'currency_id'}"/>
+                                <field name="order_tax_total" readonly="1" widget="monetary"
+                                       options="{'currency_field': 'currency_id'}"/>
+                                <field name="vat_tax_total" readonly="1" widget="monetary"
+                                       options="{'currency_field': 'currency_id'}"/>
+                            </group>
+                        </group>
+                    </sheet>
+                    <notebook>
+                        <page string="Invoice Orders">
+                            <field name="invoice_orders" mode="tree">
+                                <tree string="Sales Order Lines" editable="bottom">
+                                    <field name="invoice_number"/>
+                                    <field name="order_ref"/>
+                                    <field name="partner_id"/>
+                                    <field name="amount_vat_tax" sum="Total Amount(VAT)" type="char" widget="monetary"
+                                           options="{'currency_field': 'currency_id'}"/>
+                                    <field name="vat_tax" sum="Total VAT" type="char" widget="monetary"
+                                           options="{'currency_field': 'currency_id'}"/>
+                                    <field name="cod_fees" sum="Total COD Fees" type="char" widget="monetary"
+                                           options="{'currency_field': 'currency_id'}"/>
+                                    <field name="amount_total" sum="Total Orders Fees" type="char" widget="monetary"
+                                           options="{'currency_field': 'currency_id'}"/>
+                                    <field name="order_cash" sum="Total Cash" type="char" widget="monetary"
+                                           options="{'currency_field': 'currency_id'}"/>
+                                </tree>
+                            </field>
+                            <div class="oe_clear"/>
+                        </page>
+                    </notebook>
+                    <div class="oe_chatter">
+                        <field name="message_follower_ids" widget="mail_followers"/>
+                        <field name="activity_ids" widget="mail_activity"/>
+                        <field name="message_ids" widget="mail_thread"/>
+                    </div>
+                </form>
+            </field>
+        </record>
+
+
+        <record model="ir.ui.view" id="invoice_ordrs_tree">
+            <field name="name">sale.invoice.order.tree</field>
+            <field name="model">sale.order.invoice</field>
+            <field name="type">tree</field>
+            <field name="arch" type="xml">
+                <tree string="Invoices" create="false" edit="false" delete="false">
+                    <!--<field name="partner_id" readonly="1"/>-->
+                    <field name="invoice_number" readonly="1"/>
+                    <field name="order_ref" readonly="1"/>
+                    <field name="partner_id" readonly="1"/>
+                    <field name="order_tax" sum="Total Cash" type="char" readonly="1"/>
+                    <field name="vat_tax" sum="Total VAT" type="char" readonly="1"/>
+                    <field name="cod_fees" sum="Total COD Fees" type="char" readonly="1"/>
+                    <field name="amount_vat_tax" sum="Total Amount(VAT)" type="char" readonly="1"/>
+                    <field name="amount_total" sum="Total Orders Fees" type="char" readonly="1"/>
+                    <field name="order_cash" sum="Total Cash" type="char" readonly="1"/>
+                    <field name="paid_amount" sum="Total Orders Fees" type="char" readonly="1"/>
+
+                </tree>
+            </field>
+        </record>
+
+        <record model="ir.ui.view" id="report_sale_order_tree">
+            <field name="name">report.sale.order.tree</field>
+            <field name="model">sale.order</field>
+            <field name="type">tree</field>
+            <field name="arch" type="xml">
+                <tree string="ALL Orders" create="false" edit="false" delete="false">
+                    <field name="name"/>
+                    <field name="order_number"/>
+                    <field name="partner_id"/>
+                    <field name="create_uid"/>
+                    <field name="create_date"/>
+                    <field name="write_uid"/>
+                    <field name="write_date"/>
+                    <field name="x_Sale_Order_Customer_name"/>
+                    <field name="x_Sale_order_Mobile_No"/>
+                    <field name="x_Sale_Order_Phone_Number"/>
+                    <field name="x_Sale_Order_Cust_Prod"/>
+                    <field name="product_id" string="City"/>
+                    <field name="x_sale_order_shipping_address"/>
+                    <field name="reversed_order"/>
+                    <field name="x_Sale_Order_COD"/>
+                    <field name="x_Sale_Order_COD_Done"/>
+                    <field name="x_Sale_Order_Cash" sum="Total COD"/>
+                    <field name="amount_total" string="Paid Amount" sum="Total Paid"/>
+                    <field name="cod_fees" sum="Total COD fees"/>
+                    <field name="x_call_center_reason"/>
+                    <field name="x_Sale_Order_In_Transit_State"/>
+                    <field name="x_Sale_Order_First_Call_State"/>
+                    <field name="x_Sale_Order_First_OFD_State"/>
+                    <field name="x_Sale_Order_Scheduled_State"/>
+                    <field name="x_Sale_Order_Delivered_State"/>
+                    <field name="x_Sale_Order_Req_For_Cancel_State"/>
+                    <field name="reversed_order"/>
+                    <field name="x_Call_Center_Schedule_Time"/>
+                    <field name="x_Call_Center_Date"/>
+                    <field name="x_Sale_Order_Cust_Comment"/>
+                    <field name="x_cust_call_center_comment"/>
+                    <field name="x_sale_order_driver_name"/>
+                    <field name="first_call"/>
+                    <field name="second_call"/>
+                    <field name="third_call"/>
+                    <field name="fourth_call"/>
+                    <field name="cod_fees_discount_percentage"/>
+                    <field name="order_fees_discount_percentage"/>
+                    <field name="state" invisible="1"/>
+                </tree>
+            </field>
+        </record>
+
+        <record model="ir.ui.view" id="customer_portal_sales_orders_form">
+            <field name="name">cutomer.portal.sales.orders.custom.form</field>
+            <field name="model">sale.order</field>
+            <field name="type">form</field>
+            <field name="arch" type="xml">
+                <form string="Order" create="false" edit="true">
+                    <sheet>
+                        <div class="oe_title">
+                            <h1>
+                                Order Ref. #
+                                <field name="name" readonly="1"/>
+                                <field name="img_attach"/>
+                            </h1>
+                        </div>
+                        <group>
+                            <group string="Order Details">
+                                <field name="order_number" readonly="1"/>
+                                <field name="user_id" readonly="1"/>
+                                <field name="create_date"/>
+                                <field name="partner_id" readonly="1"/>
+                                <field name="x_Sale_Order_Customer_name"/>
+                                <field name="x_Sale_order_Mobile_No"/>
+                                <field name="x_Sale_Order_Phone_Number"/>
+                                <field name="x_Sale_Order_Cust_Prod"/>
+                                <field name="x_Sale_Order_Scheduled_State" readonly="1"/>
+                                <field name="x_Sale_Order_First_Call_State" readonly="1"/>
+                                <field name="x_Sale_Order_Delivered_State" readonly="1"/>
+                                <field name="product_id" readonly="1" string="City"/>
+                                <field name="x_sale_order_shipping_address"/>
+                                <field name="x_Sale_Order_Cust_Comment"/>
+                            </group>
+                            <group string="Outbound Calls">
+                                <field name="first_call" readonly="1"/>
+                                <field name="second_call" readonly="1"/>
+                                <field name="third_call" readonly="1"/>
+                                <field name="fourth_call" readonly="1"/>
+                            </group>
+                        </group>
+                        <group>
+                            <group string="Fees">
+                                <field name="x_Sale_Order_COD" readonly="1"/>
+                                <field name="x_Sale_Order_COD_Done" readonly="1"/>
+                                <field name="reversed_order" readonly="1"/>
+                                <field name="x_Sale_Order_Cash" readonly="1"/>
+                                <!--<field name="tax_repriced" string="Tax 10%" readonly="1"/>
+                                <field name="vat_tax" readonly="1"/>
+                                <field name="cod_fees" readonly="1"/>-->
+                                <field name="amount_vat_tax" string="Delivery Fees" readonly="1"/>
+                                <field name="state" invisible="1"/>
+                            </group>
+                        </group>
+                        <notebook>
+                            <page string="Scheduling Information">
+                                <group string="Actions">
+                                    <group>
+                                        <field name="x_call_center_reason" readonly="1"/>
+                                        <field name="x_sale_order_schedule_confirmed" readonly="1"/>
+                                    </group>
+                                    <group>
+                                        <field name="x_Call_Center_Date" readonly="1"/>
+                                        <field name="x_Call_Center_Schedule_Time" readonly="1"/>
+                                    </group>
+                                </group>
+                            </page>
+                        </notebook>
+                    </sheet>
+                </form>
+            </field>
+        </record>
+
+        <record model="ir.ui.view" id="sales_orders_view_custom_form">
+            <field name="name">sales.orders.custom.form</field>
+            <field name="model">sale.order</field>
+            <field name="type">form</field>
+            <field name="arch" type="xml">
+                <form string="Sales Order" class="o_sale_order" create="false" edit="false">
+                    <header>
+                        <!--<button name="302" string="Create Invoice" type="action" class="btn-primary" attrs="{'invisible': [('invoice_status', '!=', 'to invoice')]}"/>
+                        <button name="302" string="Create Invoice" type="action" context="{'default_advance_payment_method': 'percentage'}" attrs="{'invisible': ['|',('invoice_status', '!=', 'no'), ('state', '!=', 'sale')]}"/>-->
+                        <button name="action_quotation_send" string="Send by Email" type="object" states="draft"
+                                class="btn-primary"/>
+                        <button name="print_quotation" string="Print" type="object" states="draft" class="btn-primary"/>
+                        <!--<button name="action_confirm" states="sent" string="Confirm Sale" class="btn-primary o_sale_confirm" type="object"/>-->
+                        <!--<button name="action_confirm" states="draft" string="Confirm Sale" class="o_sale_confirm" type="object"/>-->
+                        <button name="print_quotation" string="Print" type="object" states="sent,sale"/>
+                        <button name="action_quotation_send" string="Send by Email" type="object" states="sent,sale"/>
+                        <!--<button name="action_cancel" states="draft,sent,sale" type="object" string="Cancel"/>-->
+                        <!--<button name="action_draft" states="cancel" type="object" string="Set to Quotation"/>-->
+                        <!--<button name="action_done" type="object" string="Lock" states="sale" help="If the sale is locked, you can not modify it anymore. However, you will still be able to invoice or deliver."/>-->
+                        <field name="state" widget="statusbar" statusbar_visible="draft,sent,sale"/>
+                    </header>
+                    <div style="background-image:linear-gradient(to bottom, #fcfcfc, #dedede)" class="text-right">
+                        <field name="x_Sale_Order_In_Transit_State" widget="statusbar"
+                               statusbar_visible="InTransit,Picked,RecievedinWarehouse,shelved,readyForDispatch,dispatched"/>
+                        <br/>
+                        <field name="x_Sale_Order_Scheduled_State" widget="statusbar"
+                               statusbar_visible="none,NotScheduled,Scheduled,,,,"/>
+                        <br/>
+                        <field name="x_Sale_Order_First_Call_State" widget="statusbar"
+                               statusbar_visible="none,firstCall,secondCall,thirdCall,fourthCall,,"/>
+                        <br/>
+                        <field name="x_Sale_Order_First_OFD_State" widget="statusbar"
+                               statusbar_visible="none,firstOfd,firstRto,secondOfd,onHold,readyToDispatchToSender,inTransitBackToSender,returnToSender"/>
+                        <br/>
+                        <field name="x_Sale_Order_Delivered_State" widget="statusbar"
+                               statusbar_visible="none,delivered,notDelivered"/>
+                        <br/>
+                        <field name="x_Sale_Order_Req_For_Cancel_State" widget="statusbar"
+                               statusbar_visible="none,requestForCancel,readyToDispatch,cancelOrderInTransit,cancelOrderReturned"/>
+                    </div>
+                    <sheet>
+                        <div class="oe_button_box" name="button_box">
+                            <button name="action_view_invoice" type="object" class="oe_stat_button"
+                                    icon="fa-pencil-square-o" attrs="{'invisible': [('invoice_count', '=', 0)]}">
+                                <field name="invoice_count" widget="statinfo" string="Invoices"/>
+                            </button>
+                        </div>
+                        <div class="oe_title">
+                            <h1>
+                                Order Ref. #
+                                <field name="name" readonly="1"/>
+                                <field name="img_attach"/>
+                            </h1>
+                        </div>
+                        <div>
+                            <field name="img_QR"/>
+                        </div>
+                        <group>
+                            <group>
+                                <field name="partner_id" domain="[('customer','=',True)]"
+                                       context="{'search_default_customer':1, 'show_address': 1}"
+                                       options="{&quot;always_reload&quot;: True}"/>
+                                <field name="partner_invoice_id" groups="sale.group_delivery_invoice_address"
+                                       context="{'default_type':'invoice'}"/>
+                                <field name="partner_shipping_id" groups="sale.group_delivery_invoice_address"
+                                       context="{'default_type':'delivery'}"/>
+                                <field name="x_Sale_Order_Customer_name"/>
+                                <field name="x_Sale_order_Mobile_No"/>
+                                <field name="x_Sale_Order_Phone_Number"/>
+                                <field name="x_sale_order_shipping_address"/>
+                                <field name="x_Sale_Order_Cust_Comment"/>
+                            </group>
+                            <group>
+                                <field name="create_date"/>
+                                <field name="date_order"
+                                       attrs="{'invisible': [('state', 'in', ['sale', 'done', 'cancel'])]}"/>
+                                <field name="validity_date" attrs="{'invisible': [('state', 'in', ['sale', 'done'])]}"/>
+                                <field name="confirmation_date"
+                                       attrs="{'invisible': [('state', 'in', ['draft', 'sent', 'cancel'])]}"/>
+                                <field name="pricelist_id" groups="product.group_sale_pricelist"/>
+                                <field name="currency_id" invisible="1"/>
+                                <field name="payment_term_id" options="{'no_create': True}"/>
+                                <newline/>
+                                <!--<field name="x_Sale_Order_Cash" widget="monetary" on_change="sale_order_cash_on_delivery_OnChange(x_Sale_Order_Cash)" />-->
+                                <field name="x_Sale_Order_COD"/>
+                                <field name="x_Sale_Order_COD_Done"/>
+                                <field name="reversed_order"/>
+                                <field name="x_sale_order_driver_name"/>
+                                <field name="x_sale_order_picking_driver_name"/>
+                                <field name="x_Sale_Order_Cust_Prod"/>
+                            </group>
+                        </group>
+                        <notebook>
+                            <page string="Order Lines">
+                                <field name="order_line" mode="tree,kanban"
+                                       attrs="{'readonly': [('state', 'in', ('done','cancel'))]}">
+                                    <form string="Sales Order Lines">
+                                        <group>
+                                            <group>
+                                                <field name="product_id"
+                                                       context="{'partner_id':parent.partner_id, 'quantity':product_uom_qty, 'pricelist':parent.pricelist_id, 'uom':product_uom, 'company_id': parent.company_id}"
+                                                       attrs="{'readonly': ['|', ('qty_invoiced', '&gt;', 0)]}"/>
+                                                <!--<field name="layout_category_id" groups="sale.group_sale_layout"/>-->
+                                                <field name="invoice_status" invisible="1"/>
+                                                <field name="qty_to_invoice" invisible="1"/>
+                                                <!--<field name="qty_delivered_updateable" invisible="1"/>-->
+                                                <!--<field name="procurement_ids" invisible="1"/>-->
+                                                <field name="price_subtotal" invisible="1"/>
+                                                <label for="product_uom_qty" string="Ordered Quantity"/>
+                                                <div>
+                                                    <field context="{'partner_id':parent.partner_id, 'quantity':product_uom_qty, 'pricelist':parent.pricelist_id, 'uom':product_uom, 'uom_qty_change':True, 'company_id': parent.company_id}"
+                                                           name="product_uom_qty" class="oe_inline"/>
+                                                    <field name="product_uom" groups="product.group_uom"
+                                                           class="oe_inline oe_no_button"
+                                                           attrs="{'readonly': [('state', 'in', ('sale','done', 'cancel'))]}"/>
+                                                </div>
+                                                <label for="qty_delivered" string="Delivered Quantity"
+                                                       invisible="context.get('hide_sale')"/>
+                                                <div invisible="context.get('hide_sale')">
+                                                    <field name="qty_delivered"/>
+                                                </div>
+                                                <label for="qty_invoiced" string="Invoiced Quantity"
+                                                       invisible="context.get('hide_sale')"/>
+                                                <div invisible="context.get('hide_sale')">
+                                                    <field name="qty_invoiced" invisible="context.get('hide_sale')"/>
+                                                </div>
+                                                <field name="price_unit"/>
+                                                <label for="discount" groups="sale.group_discount_per_so_line"/>
+                                                <div name="discount" groups="sale.group_discount_per_so_line">
+                                                    <field name="discount" class="oe_inline"/>
+                                                    %
+                                                </div>
+                                            </group>
+                                            <group>
+                                                <field name="tax_id" widget="many2many_tags"
+                                                       domain="[('type_tax_use','=','sale'),('company_id','=',parent.company_id)]"
+                                                       attrs="{'readonly': [('qty_invoiced', '&gt;', 0)]}"/>
+                                                <label for="customer_lead"/>
+                                                <div>
+                                                    <field name="customer_lead" class="oe_inline"/>
+                                                    days
+                                                </div>
+                                                <label for="analytic_tag_ids"
+                                                       groups="analytic.group_analytic_accounting"/>
+                                                <div>
+                                                    <field name="analytic_tag_ids" widget="many2many_tags"
+                                                           groups="analytic.group_analytic_accounting"/>
+                                                </div>
+                                            </group>
+                                        </group>
+                                        <label for="name"/>
+                                        <field name="name"/>
+                                        <div groups="base.group_no_one">
+                                            <label for="invoice_lines"/>
+                                            <field name="invoice_lines"/>
+                                        </div>
+                                        <field name="state" invisible="1"/>
+                                    </form>
+                                    <tree string="Sales Order Lines" editable="bottom"
+                                          decoration-info="invoice_status=='to invoice'">
+                                        <field name="sequence" widget="handle"/>
+                                        <field name="product_id"
+                                               attrs="{'readonly': ['|', ('qty_invoiced', '&gt;', 0)]}"
+                                               context="{'partner_id':parent.partner_id, 'quantity':product_uom_qty, 'pricelist':parent.pricelist_id, 'uom':product_uom, 'company_id': parent.company_id}"/>
+                                        <!--<field name="layout_category_id" groups="sale.group_sale_layout"/>-->
+                                        <field name="name"/>
+                                        <field name="product_uom_qty" string="Ordered Qty"
+                                               context="{'partner_id':parent.partner_id, 'quantity':product_uom_qty, 'pricelist':parent.pricelist_id, 'uom':product_uom, 'company_id': parent.company_id}"/>
+                                        <field name="qty_delivered" invisible="context.get('hide_sale')"/>
+                                        <field name="qty_invoiced" invisible="context.get('hide_sale')"/>
+                                        <field name="qty_to_invoice" invisible="1"/>
+                                        <field name="product_uom"
+                                               attrs="{'readonly': [('state', 'in', ('sale','done', 'cancel'))]}"
+                                               context="{'company_id': parent.company_id}" groups="product.group_uom"
+                                               options="{&quot;no_open&quot;: True}"/>
+                                        <field name="analytic_tag_ids" groups="analytic.group_analytic_accounting"
+                                               widget="many2many_tags"/>
+                                        <field name="price_unit" attrs="{'readonly': [('qty_invoiced', '&gt;', 0)]}"/>
+                                        <field name="tax_id" widget="many2many_tags"
+                                               domain="[('type_tax_use','=','sale'),('company_id','=',parent.company_id)]"
+                                               attrs="{'readonly': [('qty_invoiced', '&gt;', 0)]}"/>
+                                        <field name="discount" groups="sale.group_discount_per_so_line"/>
+                                        <field name="price_subtotal" widget="monetary"
+                                               groups="sale.group_show_price_subtotal"/>
+                                        <field name="price_total" widget="monetary"
+                                               groups="sale.group_show_price_total"/>
+                                        <!--<field name="qty_delivered_updateable" invisible="1"/>-->
+                                        <!--<field name="procurement_ids" invisible="1"/>-->
+                                        <field name="state" invisible="1"/>
+                                        <field name="invoice_status" invisible="1"/>
+                                        <field name="customer_lead" invisible="1"/>
+                                        <field name="currency_id" invisible="1"/>
+                                    </tree>
+                                    <kanban class="o_kanban_mobile">
+                                        <field name="product_id"/>
+                                        <field name="product_uom_qty"/>
+                                        <field name="product_uom" groups="product.group_uom"/>
+                                        <field name="price_subtotal"/>
+                                        <templates>
+                                            <t t-name="kanban-box">
+                                                <div t-attf-class="oe_kanban_card oe_kanban_global_click">
+                                                    <div class="row">
+                                                        <div class="col-xs-12">
+                                                            <strong>
+                                                                <span>
+                                                                    <t t-esc="record.product_id.value"/>
+                                                                </span>
+                                                            </strong>
+                                                        </div>
+                                                    </div>
+                                                    <div class="row">
+                                                        <div class="col-xs-8 text-muted">
+                                                            <span>
+                                                                <t t-esc="record.product_uom_qty.value"/>
+                                                                <t t-esc="record.product_uom.value"/>
+                                                            </span>
+                                                        </div>
+                                                        <div class="col-xs-4 text-muted">
+                                                            <span class="pull-right text-right">
+                                                                <t t-esc="record.price_subtotal.value"/>
+                                                            </span>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </t>
+                                        </templates>
+                                    </kanban>
+                                </field>
+                                <group class="oe_subtotal_footer oe_right" colspan="2" name="sale_total">
+                                    <field name="x_Sale_Order_Cash" widget="monetary"
+                                           options="{'currency_field': 'currency_id'}"/>
+                                    <field name="order_fees_discount_percentage"/>
+                                    <field name="cod_fees_discount_percentage"/>
+                                    <field name="delivery_repriced" widget="monetary"
+                                           options="{'currency_field': 'currency_id'}"/>
+                                    <field name="cod_fees"/>
+                                    <field name="tax_repriced" widget="monetary"
+                                           options="{'currency_field': 'currency_id'}"/>
+                                    <field name="vat_tax"/>
+                                    <field name="amount_vat_tax"/>
+                                    <div class="oe_subtotal_footer_separator oe_inline o_td_label">
+                                        <label for="total_cash"/>
+                                        <button name="button_dummy" states="draft,sent" string="(update)" type="object"
+                                                class="oe_edit_only oe_link"/>
+                                    </div>
+                                    <field name="total_cash" nolabel="1" class="oe_subtotal_footer_separator"
+                                           widget="monetary" options="{'currency_field': 'currency_id'}"/>
+                                </group>
+                                <field name="note" class="oe_inline"
+                                       placeholder="Setup default terms and conditions in your company settings."/>
+                                <div class="oe_clear"/>
+                            </page>
+                            <page string="Other Information">
+                                <group>
+                                    <group string="Sales Information" name="sales_person">
+                                        <field name="user_id"/>
+                                        <field name="team_id" options="{'no_create': True}"/>
+                                        <field name="client_order_ref"/>
+                                        <field name="company_id" options="{'no_create': True}"
+                                               groups="base.group_multi_company"/>
+                                        <!--<field name="project_ids" attrs="{'invisible':[('state','=','sale')]}"
+                                               context="{'default_partner_id':partner_invoice_id, 'default_name':name}"
+                                               groups="analytic.group_analytic_accounting"/>-->
+                                        <!--<field name="related_project_id"
+                                               attrs="{'readonly': ['|',('project_ids','!=',False),('invoice_count','!=',0),('state','=','sale')],'invisible':[('state','!=','sale')]}"
+                                               context="{'default_partner_id':partner_invoice_id, 'default_name':name}"
+                                               groups="analytic.group_analytic_accounting"/>-->
+                                    </group>
+                                    <group name="sale_pay" string="Invoicing">
+                                        <field name="fiscal_position_id" options="{'no_create': True}"/>
+                                        <field name="invoice_status"
+                                               attrs="{'invisible': [('state', 'not in', ('sale','done'))]}"/>
+                                    </group>
+                                    <group string="Reporting" name="technical" groups="base.group_no_one">
+                                        <field groups="base.group_no_one" name="origin"/>
+                                    </group>
+                                </group>
+                            </page>
+                        </notebook>
+                    </sheet>
+                    <div class="oe_chatter">
+                        <field name="message_follower_ids" widget="mail_followers"/>
+                        <field name="activity_ids" widget="mail_activity"/>
+                        <field name="message_ids" widget="mail_thread"/>
+                    </div>
+                </form>
+            </field>
+        </record>
+
+        <record model="ir.ui.view" id="customer_portal_sales_orders_tree">
+            <field name="name">cutomer.portal.sales.orders.custom.tree</field>
+            <field name="model">sale.order</field>
+            <field name="type">tree</field>
+            <field name="arch" type="xml">
+                <tree string="Orders" create="true" edit="false">
+                    <field name="name"/>
+                    <field name="order_number"/>
+                    <field name="partner_id"/>
+                    <field name="create_date"/>
+                    <field name="x_Sale_Order_Customer_name"/>
+                    <field name="x_Sale_order_Mobile_No"/>
+                    <field name="x_Sale_Order_Phone_Number"/>
+                    <field name="x_Sale_Order_Cust_Prod"/>
+                    <field name="x_Sale_Order_Scheduled_State"/>
+                    <field name="x_sale_order_shipping_address"/>
+                    <field name="reversed_order"/>
+                    <field name="x_Sale_Order_COD"/>
+                    <field name="x_Sale_Order_COD_Done"/>
+                    <field name="x_Sale_Order_Cash" sum="Total COD"/>
+                    <field string="Paid Amount" name="amount_total" sum="Total Paid"/>
+                    <field name="x_call_center_reason"/>
+                    <field name="x_Sale_Order_First_Call_State"/>
+                    <field name="x_Sale_Order_Delivered_State"/>
+                    <field name="state" invisible="1"/>
+                </tree>
+            </field>
+        </record>
+
+        <record model="ir.ui.view" id="invoiced_sales_orders_tree">
+            <field name="name">invoiced.sales.orders.tree</field>
+            <field name="model">sale.order</field>
+            <field name="type">tree</field>
+            <field name="arch" type="xml">
+                <tree string="Orders" create="false" edit="false">
+                    <field name="name"/>
+                    <field name="order_number"/>
+                    <field name="partner_id"/>
+                    <field name="create_date"/>
+                    <field name="x_Sale_Order_Customer_name"/>
+                    <field name="x_Sale_order_Mobile_No"/>
+                    <field name="x_Sale_Order_Phone_Number"/>
+                    <field name="x_Sale_Order_Cust_Prod"/>
+                    <field name="x_Sale_Order_Scheduled_State"/>
+                    <field name="reversed_order"/>
+                    <field name="x_Sale_Order_COD"/>
+                    <field name="x_Sale_Order_COD_Done"/>
+                    <field name="x_Sale_Order_Cash" sum="Total COD"/>
+                    <field string="Paid Amount" name="amount_total" sum="Total Paid"/>
+                    <field name="invoice_status"/>
+                    <field name="state"/>
+                </tree>
+            </field>
+        </record>
+
+        <record model="ir.ui.view" id="view_quotation_sales_orders_tree">
+            <field name="name">Quotation</field>
+            <field name="model">sale.order</field>
+            <field name="type">tree</field>
+            <field name="arch" type="xml">
+                <tree string="Quotation">
+                    <field name="name"/>
+                    <field name="order_number"/>
+                    <field name="partner_id"/>
+                    <field name="create_date"/>
+                    <field name="x_Sale_Order_Customer_name"/>
+                    <field name="x_Sale_order_Mobile_No"/>
+                    <field name="x_Sale_Order_Phone_Number"/>
+                    <field name="x_Sale_Order_Cust_Prod"/>
+                    <field name="x_Sale_Order_Scheduled_State"/>
+                    <field name="reversed_order"/>
+                    <field name="x_Sale_Order_COD"/>
+                    <field name="x_Sale_Order_COD_Done"/>
+                    <field name="x_Sale_Order_Cash" sum="Total COD"/>
+                    <field string="Paid Amount" name="amount_total" sum="Total Paid"/>
+                    <field name="invoice_status"/>
+                    <field name="state"/>
+                </tree>
+            </field>
+        </record>
+
+        <record model="ir.ui.view" id="view_sales_orders_sales_orders_tree">
+            <field name="name">Sales Orders</field>
+            <field name="model">sale.order</field>
+            <field name="type">tree</field>
+            <field name="arch" type="xml">
+                <tree string="Sales Orders">
+                    <field name="name"/>
+                    <field name="order_number"/>
+                    <field name="partner_id"/>
+                    <field name="create_date"/>
+                    <field name="x_Sale_Order_Customer_name"/>
+                    <field name="x_Sale_order_Mobile_No"/>
+                    <field name="x_Sale_Order_Phone_Number"/>
+                    <field name="x_Sale_Order_Cust_Prod"/>
+                    <field name="x_Sale_Order_Scheduled_State"/>
+                    <field name="reversed_order"/>
+                    <field name="x_Sale_Order_COD"/>
+                    <field name="x_Sale_Order_COD_Done"/>
+                    <field name="x_Sale_Order_Cash" sum="Total COD"/>
+                    <field string="Paid Amount" name="amount_total" sum="Total Paid"/>
+                    <field name="invoice_status"/>
+                    <field name="state"/>
+                </tree>
+            </field>
+        </record>
+
+        <record model="ir.ui.view" id="client_account_invoice_sale_form">
+            <field name="name">client.account.invoice.sale.form</field>
+            <field name="model">account.sale.invoice</field>
+            <field name="type">form</field>
+            <field name="arch" type="xml">
+                <form string="Invoices" create="false" edit="false" delete='false'>
+                    <header>
+                        <button name="action_client_invoice_approve" string="Invoice Approve" type="object"
+                                class="btn-primary"
+                                attrs="{'invisible':[('state','!=','sent')]}"/>
+                        <field name="state" widget="statusbar" readonly="1"/>
+                    </header>
+                    <sheet>
+                        <div class="oe_title">
+                            <h1>
+                                Invoice #
+                                <field name="invoice_number" readonly="1"/>
+                                <!--<field name="img_attach" />-->
+                            </h1>
+                        </div>
+                        <group>
+                            <group>
+                                <!--<field name="partner_id" />-->
+                                <field name="invoice_count" readonly="1"/>
+                            </group>
+                            <group>
+                                <field name="paid_amount_total" readonly="1"/>
+                                <field name="order_cash_total" readonly="1"/>
+                                <field name="orders_fees_total" readonly="1"/>
+                                <field name="cod_fees_total" readonly="1"/>
+                                <field name="amount_vat_tax_total" readonly="1"/>
+                                <field name="order_tax_total" readonly="1"/>
+                                <field name="vat_tax_total" readonly="1"/>
+                            </group>
+                        </group>
+                    </sheet>
+                    <notebook>
+                        <page string="Invoice Orders">
+                            <field name="invoice_orders" mode="tree">
+                                <tree string="Orders">
+                                    <field name="invoice_number"/>
+                                    <field name="order_ref"/>
+                                    <field name="partner_id"/>
+                                    <field name="amount_vat_tax" sum="Total Amount(VAT)" type="char"/>
+                                    <field name="vat_tax" sum="Total VAT" type="char"/>
+                                    <field name="cod_fees" sum="Total COD Fees" type="char"/>
+                                    <field name="amount_total" sum="Total Orders Fees" type="char"/>
+                                    <field name="order_cash" sum="Total Cash" type="char"/>
+                                </tree>
+                            </field>
+                            <div class="oe_clear"/>
+                        </page>
+                    </notebook>
+                </form>
+            </field>
+        </record>
+
+        <record model="ir.ui.view" id="client_create_manual_order_form">
+            <field name="name">client.create.manual.order.form</field>
+            <field name="model">create.manual.order</field>
+            <field name="type">form</field>
+            <field name="arch" type="xml">
+                <form string="Create Orders" create="true" edit="false" delete='false'>
+                    <notebook>
+                        <page string="Create Orders">
+                            <field name="order_id" mode="tree">
+                                <tree string="Orders" editable="bottom">
+                                    <!--<field name="name" />-->
+                                    <field name="order_number"/>
+                                    <!--<field name="partner_id" domain="[('id', '=', uid)]"/>-->
+                                    <field name="x_Sale_Order_COD"/>
+                                    <field name="reversed_order"/>
+                                    <!--<field name="cod_fees"  />-->
+                                    <field name="product_id" string="City"/>
+                                    <field name="x_Sale_Order_Cash"/>
+                                    <field name="x_Sale_Order_Customer_name"/>
+                                    <field name="x_Sale_order_Mobile_No"/>
+                                    <field name="x_Sale_Order_Phone_Number"/>
+                                    <field name="x_Sale_Order_Cust_Prod"/>
+                                    <field name="x_sale_order_shipping_address"/>
+                                    <field name="x_Sale_Order_Cust_Comment"/>
+                                    <field name="state" invisible="1"/>
+                                </tree>
+                            </field>
+                            <div class="oe_clear"/>
+                        </page>
+                    </notebook>
+                </form>
+            </field>
+        </record>
+
+        <record model="ir.ui.view" id="client_account_invoice_sale_tree">
+            <field name="name">client.account.invoice.sale.tree</field>
+            <field name="model">account.sale.invoice</field>
+            <field name="type">tree</field>
+            <field name="arch" type="xml">
+                <tree string="Invoices" create="false" edit="false" delete="false">
+                    <!--<field name="partner_id" readonly="1"/>-->
+                    <field name="invoice_number" readonly="1"/>
+                    <field name="order_cash_total" type="char"/>
+                    <field name="orders_fees_total" type="char"/>
+                    <field name="cod_fees_total" type="char"/>
+                    <field name="paid_amount_total" type="char"/>
+                    <field name="state" readonly="1"/>
+                </tree>
+            </field>
+        </record>
+
+        <record model="ir.ui.view" id="search_filter_id">
+            <field name="name">cr.call.center.sale.order.filter.unassigned</field>
+            <field name="model">sale.order</field>
+            <field name="type">search</field>
+            <field name="arch" type="xml">
+                <search string="Search String">
+                    <field name="name"/>
+                    <field name="x_Sale_Order_Customer_name"/>
+                    <field name="x_Sale_order_Mobile_No"/>
+                    <field name="x_Sale_Order_Phone_Number"/>
+                    <field name="x_Sale_Order_Cust_Prod"/>
+                    <field name="x_Sale_Order_Scheduled_State"/>
+                    <field name="x_call_center_reason"/>
+                    <filter string="Today" name="Today"
+                            domain="[('create_date','&gt;=', datetime.datetime.combine(context_today(), datetime.time(0,0,0))), ('create_date','&lt;=', datetime.datetime.combine(context_today(), datetime.time(23,59,59)))]"/>
+                    <filter string="Yesterday" name="Yesterday" domain="[('create_date','&gt;=',
+                        ((context_today()-datetime.timedelta(days=1)).strftime('%Y-%m-%d 00:00:00'))),
+                        ('create_date','&lt;=',
+                        ((context_today()+datetime.timedelta(days=0)).strftime('%Y-%m-%d 00:00:00')))]"/>
+                    <filter icon="terp-go-week"
+                            string="Current Week"
+                            separator="1"
+                            name="week"
+                            domain="[('create_date','&lt;=', (context_today() + relativedelta(weeks=0,day=7, weekday=-1)).strftime('%Y-%m-%d'))
+                        ,('create_date','&gt;=',(context_today() - relativedelta(weeks=1, weekday=0)).strftime('%Y-%m-%d'))]"
+                            help="Current Week"
+                            context="{'group_by':'create_date'}"/>
+                    <filter string="Last week" name="Last_week" domain="[('create_date', '&gt;=', ((context_today()+relativedelta(weeks=-2,
+                    days=1, weekday=0)).strftime('%Y-%m-%d'))),('create_date', '&lt;=', ((context_today()+relativedelta(weeks=-1,weekday=6)).strftime('%Y-%m-%d')))]"/>
+                    <filter icon="terp-go-month" string="Current Month" name="month" domain="[('create_date','&lt;=',
+                        (datetime.date.today()+relativedelta(day=31)).strftime('%Y-%m-%d')),
+                        ('create_date','&gt;=',(datetime.date.today()-relativedelta(day=1)).strftime('%Y-%m-%d'))]"
+                            help="Current Month"/>
+                    <filter string="Prev Month" name="prev_month"
+                            domain="[('create_date','&gt;=',(context_today()-relativedelta(months=1)).strftime('%Y-%m-01')),('create_date','&lt;',time.strftime('%Y-%m-01'))]"/>
+                    <!--<filter name="x_Sale_Order_Scheduled_State" string="Unassigned Orders" domain="[('x_Sale_Order_Scheduled_State','!=','Scheduled')]"/>-->
+                    <!--<filter name="Sale_Order_First_Call" string="1st Call Sales Orders" domain="[('x_Sale_Order_First_Call_State','=','firstCall')]"/>-->
+                    <!--<filter name="Sale_Order_Second_Call" string="2nd Call Sales Orders" domain="[('x_Sale_Order_First_Call_State','=','secondCall')]"/>-->
+                    <!--<filter name="Sale_Order_Third_Call" string="3rd Call Sales Orders" domain="[('x_Sale_Order_First_Call_State','=','thirdCall')]"/>
+                    <filter name="Sale_Order_Fourth_Call" string="4th Call Sales Orders" domain="[('x_Sale_Order_First_Call_State','=','fourthCall')]"/>-->
+                    <!--<filter name="Customer_Scheduled_Sale_Order" string="Scheduled Sales Orders" domain="[('x_Sale_Order_Scheduled_State','=','Scheduled')]"/>
+                    <filter name="Customer_Not_Scheduled_Sale_Order" string="Not Scheduled Sales Orders" domain="[('x_Sale_Order_Scheduled_State','=','NotScheduled')]"/>
+                    <filter name="Customer_COD_Sale_Order" string="COD Sales Orders" domain="[('x_Sale_Order_COD','=','True')]"/>
+                    <filter name="Customer_Not_COD_Sale_Order" string="Not COD Sales Orders" domain="[('x_Sale_Order_COD','=','False')]"/>-->
+                    <!--<filter name="Customer_Not_Reached_Sale_Order" string="Not Reached Sales Orders" domain="[('x_call_center_reason','=','NotReachedMobileSwitchedOff')]"/>-->
+                    <filter name="group_courier" string="Courier Name"
+                            context="{'group_by':'x_sale_order_driver_name'}"/>
+                    <filter name="group_partner_id" string="Partner Name" context="{'group_by':'partner_id'}"/>
+                </search>
+            </field>
+        </record>
+
+        <record model="ir.ui.view" id="crm_unassigned_call_center_sale_order">
+            <field name="name">crm.call.center.unassigned.sale.order</field>
+            <field name="model">sale.order</field>
+            <field name="type">tree</field>
+            <field name="arch" type="xml">
+                <tree string="Unassigned Sales Orders" create="false" delete="false">
+                    <field name="name"/>
+                    <field name="partner_id"/>
+                    <field name="create_date"/>
+                    <field name="x_Sale_Order_Customer_name"/>
+                    <field name="x_Sale_order_Mobile_No"/>
+                    <field name="x_Sale_Order_Phone_Number"/>
+                    <field name="x_Sale_Order_Cust_Prod"/>
+                    <field name="x_Sale_Order_Scheduled_State"/>
+                    <field name="x_sale_order_shipping_address"/>
+                    <field name="reversed_order"/>
+                    <field name="x_Sale_Order_COD"/>
+                    <field name="x_call_center_reason"/>
+                    <field name="x_Sale_Order_First_Call_State"/>
+                    <field name="state"/>
+                </tree>
+            </field>
+        </record>
+
+        <record model="ir.ui.view" id="courier_COD_recieved_sale_order">
+            <field name="name">courier.COD.recieved.sale.order</field>
+            <field name="model">sale.order</field>
+            <field name="type">tree</field>
+            <field name="arch" type="xml">
+                <tree string="Courier COD Recieved" create="false" edit="true">
+                    <button name="cod_recieved" string="COD Recieved" type="object" class="oe_highlight"
+                            attrs="{'invisible':[('x_Sale_Order_COD_Done','=','True')]}"/>
+                    <field name="name" readonly="1"/>
+                    <field name="x_sale_order_driver_name" readonly="1"/>
+                    <field name="partner_id" readonly="1"/>
+                    <field name="create_date" readonly="1"/>
+                    <field name="x_Sale_Order_Customer_name" readonly="1"/>
+                    <field name="x_Sale_order_Mobile_No" readonly="1"/>
+                    <field name="x_Sale_Order_Phone_Number" readonly="1"/>
+                    <field name="x_Sale_Order_Cust_Prod" readonly="1"/>
+                    <field name="reversed_order" readonly="1"/>
+                    <field name="x_Sale_Order_COD" readonly="1"/>
+                    <field name="x_Sale_Order_Cash"/>
+                    <field name="x_Sale_Order_COD_Done"/>
+                    <field name="state" invisible="1" readonly="1"/>
+                </tree>
+            </field>
+        </record>
+
+        <record model="ir.ui.view" id="crm_unassigned_call_center_sale_order_form">
+            <field name="name">crm.call.center.unassigned.sale.order.form</field>
+            <field name="model">sale.order</field>
+            <field name="type">form</field>
+            <field name="arch" type="xml">
+                <form string="Call Center Unassigned Orders" create="false" edit="true" delete="false">
+                    <header>
+                        <button name="first_call_action" type="object" string="1st Call Confirmation"
+                                class="oe_highlight"
+                                attrs="{'invisible':[('x_Sale_Order_First_Call_State','in',('firstCall','secondCall','thirdCall','fourthCall'))]}"/>
+                        <button name="second_call_action" type="object" string="2nd Call Confirmation"
+                                class="oe_highlight"
+                                attrs="{'invisible':[('x_Sale_Order_First_Call_State','in',('none','secondCall','thirdCall','fourthCall'))]}"/>
+                        <button name="third_call_action" type="object" string="3rd Call Confirmation"
+                                class="oe_highlight"
+                                attrs="{'invisible':[('x_Sale_Order_First_Call_State','in',('none','firstCall','thirdCall','fourthCall'))]}"/>
+                        <button name="fourth_call_action" type="object" string="4th Call Confirmation"
+                                class="oe_highlight"
+                                attrs="{'invisible':[('x_Sale_Order_First_Call_State','in',('none','secondCall','firstCall','fourthCall'))]}"/>
+                        <button name="action_tree_view" string="Order Search" type="object"/>
+                    </header>
+                    <!--<div style="background-image:linear-gradient(to bottom, #fcfcfc, #dedede)" class="text-right">
+
+                    </div>-->
+                    <sheet>
+                        <div class="oe_title">
+                            <h1>
+                                Order Ref. #
+                                <field name="name" readonly="1"/>
+                                <field name="img_attach"/>
+                            </h1>
+                        </div>
+                        <group>
+                            <group>
+                                <field name="order_number" readonly="1"/>
+                                <field name="user_id" readonly="1"/>
+                                <field name="partner_id" readonly="1"/>
+                                <field name="x_Sale_Order_Customer_name" readonly="1"/>
+                                <field name="x_Sale_order_Mobile_No" readonly="1"/>
+                                <field name="x_Sale_Order_Phone_Number" readonly="1"/>
+                                <field name="x_Sale_Order_Cust_Prod" readonly="1"/>
+                                <field name="x_Sale_Order_In_Transit_State" readonly="1"/>
+                                <field name="x_Sale_Order_Scheduled_State" readonly="1"/>
+                                <field name="x_Sale_Order_First_Call_State" readonly="1"/>
+                                <field name="x_Sale_Order_First_OFD_State" readonly="1"/>
+                                <field name="x_Sale_Order_Req_For_Cancel_State" readonly="1"/>
+                                <field name="x_Sale_Order_Delivered_State" readonly="1"/>
+                                <field name="product_id" readonly="1" string="City"/>
+                                <field name="x_sale_order_shipping_address" readonly="1"/>
+                                <field name="x_Sale_Order_Cust_Comment" readonly="1"/>
+                                <field name="reversed_order" readonly="1"/>
+                                <field name="x_Sale_Order_COD" readonly="1"/>
+                                <field name="x_Sale_Order_Cash" readonly="1" widget="monetary"
+                                       options="{'currency_field': 'currency_id'}"/>
+                                <field name="state" invisible="1"/>
+
+                            </group>
+                            <group>
+                                <field name="create_date"/>
+                                <field name="x_cust_call_center_comment"
+                                       attrs="{'readonly':[('x_sale_order_schedule_confirmed','=', True)]}"/>
+                                <field name="x_sale_order_picking_driver_name" readonly="1"/>
+                                <field name="x_sale_order_driver_name" readonly="1"/>
+                                <field name="first_call" readonly="1"/>
+                                <field name="second_call" readonly="1"/>
+                                <field name="third_call" readonly="1"/>
+                                <field name="fourth_call" readonly="1"/>
+                            </group>
+                        </group>
+                        <notebook>
+                            <page string="Call Center">
+                                <group string="Call Center Actions">
+                                    <group>
+                                        <field name="callScript"/>
+                                        <field name="x_call_center_reason"/>
+                                        <field name="x_call_center_comment"/>
+                                        <field name="x_sale_order_schedule_confirmed"
+                                               attrs="{'readonly':[('first_call','=', True)]}"/>
+                                    </group>
+                                    <group>
+                                        <field name="x_Call_Center_Date"/>
+                                        <field name="x_Call_Center_Schedule_Time"/>
+                                    </group>
+                                </group>
+                                <group>
+                                    <group string="Call Center Last Action">
+                                        <field name="write_uid" readonly="1"/>
+                                        <field name="write_date" readonly="1"/>
+                                    </group>
+                                </group>
+                            </page>
+                        </notebook>
+                    </sheet>
+                    <div class="oe_chatter">
+                        <field name="message_follower_ids" widget="mail_followers"/>
+                        <field name="activity_ids" widget="mail_activity"/>
+                        <field name="message_ids" widget="mail_thread"/>
+                    </div>
+
+                </form>
+
+            </field>
+
+        </record>
+
+        <record model="ir.actions.act_window" id="action_crm_unassigned_call_center_sale_order">
+            <field name="name">CRM Call Center Unassigned Sales Orders</field>
+            <field name="type">ir.actions.act_window</field>
+            <field name="res_model">sale.order</field>
+            <field name="view_type">form</field>
+            <field name="view_mode">tree,kanban,form,calendar</field>
+            <!--<field name="context">{"search_default_x_Sale_Order_Scheduled_State":True}</field>-->
+            <field name="domain">
+                [('x_Sale_Order_Scheduled_State','!=','Scheduled'),('x_Sale_Order_In_Transit_State','=','Picked')
+                ,('x_Sale_Order_Delivered_State','!=','delivered')]
+            </field>
+            <!--<field name="context">{'group_by':'Customer'}</field>-->
+            <!--<field name="view_id" ref="crm_unassigned_call_center_sale_order" />-->
+            <field name="view_ids" eval="[(5, 0, 0),
+                                           (0, 0, {'view_mode': 'tree','view_id': ref('crm_unassigned_call_center_sale_order')}),
+                                           (0, 0, {'view_mode': 'form', 'view_id': ref('crm_unassigned_call_center_sale_order_form')})
+                                            ]"/>
+        </record>
+
+        <record model="ir.actions.act_window" id="action_crm_unassigned_call_center_sale_order_form">
+            <field name="name">CRM Call Center Unassigned Sales Orders Form</field>
+            <field name="type">ir.actions.act_window</field>
+            <field name="res_model">sale.order</field>
+            <field name="view_type">form</field>
+            <field name="view_mode">tree,kanban,form,calendar</field>
+            <!--<field name="context">{"search_default_x_Sale_Order_Scheduled_State":True}</field>-->
+            <field name="domain">[('x_Sale_Order_Scheduled_State','!=','Scheduled')]</field>
+            <field name="view_id" ref="crm_unassigned_call_center_sale_order_form"/>
+        </record>
+
+        <record model="ir.actions.act_window" id="action_invoice_ordrs_tree">
+            <field name="name">All Invoices Orders</field>
+            <field name="type">ir.actions.act_window</field>
+            <field name="res_model">sale.order.invoice</field>
+            <field name="view_type">form</field>
+            <field name="view_mode">tree,form</field>
+            <!--<field name="context">{'group_by':['partner_id']}</field>-->
+            <!--<field name="context">{"search_default_Customer_Not_COD_Sale_Order":True}</field>-->
+            <!--<field name="domain">[('x_Sale_Order_Delivered_State','=','delivered'),('x_Sale_Order_COD_Done','=',False)]</field>-->
+            <!--<field name="context">{'group_by':['x_sale_order_driver_name']}</field>-->
+            <!--<field name="view_id" ref="crm_unassigned_call_center_sale_order" />-->
+            <field name="view_ids" eval="[(5, 0, 0),
+                                           (0, 0, {'view_mode': 'tree','view_id': ref('invoice_ordrs_tree')})
+                                            ]"/>
+
+        </record>
+
+
+        <record model="ir.actions.act_window" id="action_report_sale_order_tree">
+            <field name="name">ALL Orders Report</field>
+            <field name="type">ir.actions.act_window</field>
+            <field name="res_model">sale.order</field>
+            <field name="view_type">form</field>
+            <field name="view_mode">tree,form</field>
+            <field name="view_ids" eval="[(5, 0, 0),
+                                       (0, 0, {'view_mode': 'tree','view_id': ref('report_sale_order_tree')}),
+                                       (0, 0, {'view_mode': 'form', 'view_id': ref('sales_orders_view_custom_form')})
+                                        ]"/>
+
+        </record>
+
+        <record model="ir.actions.act_window" id="action_crm_not_reached_call_center_sale_order">
+            <field name="name">Not Reached Orders</field>
+            <field name="type">ir.actions.act_window</field>
+            <field name="res_model">sale.order</field>
+            <field name="view_type">form</field>
+            <field name="view_mode">tree,kanban,form,calendar</field>
+            <!--<field name="context">{"search_default_Customer_Not_Reached_Sale_Order":True}</field>-->
+            <!--<field name="view_id" ref="crm_unassigned_call_center_sale_order" />-->
+            <field name="domain">[('x_call_center_reason','=','NotReachedMobileSwitchedOff')]</field>
+            <field name="view_ids" eval="[(5, 0, 0),
+                                           (0, 0, {'view_mode': 'tree','view_id': ref('crm_unassigned_call_center_sale_order')}),
+                                           (0, 0, {'view_mode': 'form', 'view_id': ref('crm_unassigned_call_center_sale_order_form')})
+                                            ]"/>
+        </record>
+
+        <record model="ir.actions.act_window" id="action_customer_portal_Scheduled_sales_orders_tree">
+            <field name="name">Scheduled Orders Portal</field>
+            <field name="type">ir.actions.act_window</field>
+            <field name="res_model">sale.order</field>
+            <field name="view_type">form</field>
+            <field name="view_mode">tree,kanban,form,calendar</field>
+            <!--<field name="context">{"search_default_Customer_Scheduled_Sale_Order":True}</field>-->
+            <field name="domain">[('x_Sale_Order_Scheduled_State','=','Scheduled')]</field>
+            <!--<field name="view_id" ref="crm_unassigned_call_center_sale_order" />-->
+            <field name="view_ids" eval="[(5, 0, 0),
+                                           (0, 0, {'view_mode': 'tree','view_id': ref('customer_portal_sales_orders_tree')}),
+                                           (0, 0, {'view_mode': 'form', 'view_id': ref('customer_portal_sales_orders_form')})
+                                            ]"/>
+
+        </record>
+
+        <record model="ir.actions.act_window" id="action_customer_portal_Reversed_sales_orders_tree">
+            <field name="name">Reversed Orders Portal</field>
+            <field name="type">ir.actions.act_window</field>
+            <field name="res_model">sale.order</field>
+            <field name="view_type">form</field>
+            <!--<field name="context">{"search_default_Customer_Scheduled_Sale_Order":True}</field>-->
+            <field name="domain">[('reversed_order','=',True)]</field>
+            <field name="view_mode">tree,kanban,form,calendar</field>
+            <!--<field name="view_id" ref="crm_unassigned_call_center_sale_order" />-->
+            <field name="view_ids" eval="[(5, 0, 0),
+                                           (0, 0, {'view_mode': 'tree','view_id': ref('customer_portal_sales_orders_tree')}),
+                                           (0, 0, {'view_mode': 'form', 'view_id': ref('customer_portal_sales_orders_form')})
+                                            ]"/>
+
+        </record>
+
+        <record model="ir.actions.act_window" id="action_customer_portal_Not_Scheduled_sales_orders_tree">
+            <field name="name">Not Scheduled Orders Portal</field>
+            <field name="type">ir.actions.act_window</field>
+            <field name="res_model">sale.order</field>
+            <field name="view_type">form</field>
+            <field name="view_mode">tree,kanban,form,calendar</field>
+            <!--<field name="context">{"search_default_Customer_Not_Scheduled_Sale_Order":True}</field>-->
+            <field name="domain">[('x_Sale_Order_Scheduled_State','=','NotScheduled')]</field>
+            <!--<field name="view_id" ref="crm_unassigned_call_center_sale_order" />-->
+            <field name="view_ids" eval="[(5, 0, 0),
+                                           (0, 0, {'view_mode': 'tree','view_id': ref('customer_portal_sales_orders_tree')}),
+                                           (0, 0, {'view_mode': 'form', 'view_id': ref('customer_portal_sales_orders_form')})
+                                            ]"/>
+
+        </record>
+
+        <record model="ir.actions.act_window" id="action_customer_portal_COD_sales_orders_tree">
+            <field name="name">COD Orders Portal</field>
+            <field name="type">ir.actions.act_window</field>
+            <field name="res_model">sale.order</field>
+            <field name="view_type">form</field>
+            <field name="view_mode">tree,kanban,form,calendar</field>
+            <!--<field name="context">{"search_default_Customer_COD_Sale_Order":True}</field>-->
+            <field name="domain">[('x_Sale_Order_COD','=',True)]</field>
+            <!--<field name="view_id" ref="crm_unassigned_call_center_sale_order" />-->
+            <field name="view_ids" eval="[(5, 0, 0),
+                                           (0, 0, {'view_mode': 'tree','view_id': ref('customer_portal_sales_orders_tree')}),
+                                           (0, 0, {'view_mode': 'form', 'view_id': ref('customer_portal_sales_orders_form')})
+                                            ]"/>
+
+        </record>
+
+        <record model="ir.actions.act_window" id="action_customer_portal_Not_COD_sales_orders_tree">
+            <field name="name">Not COD Orders Portal</field>
+            <field name="type">ir.actions.act_window</field>
+            <field name="res_model">sale.order</field>
+            <field name="view_type">form</field>
+            <field name="view_mode">tree,kanban,form,calendar</field>
+            <!--<field name="context">{"search_default_Customer_Not_COD_Sale_Order":True}</field>-->
+            <field name="domain">[('x_Sale_Order_COD','=',False)]</field>
+            <!--<field name="view_id" ref="crm_unassigned_call_center_sale_order" />-->
+            <field name="view_ids" eval="[(5, 0, 0),
+                                           (0, 0, {'view_mode': 'tree','view_id': ref('customer_portal_sales_orders_tree')}),
+                                           (0, 0, {'view_mode': 'form', 'view_id': ref('customer_portal_sales_orders_form')})
+                                            ]"/>
+
+        </record>
+
+        <record model="ir.actions.act_window" id="action_customer_portal_New_sales_orders_tree">
+            <field name="name">New Orders Portal</field>
+            <field name="type">ir.actions.act_window</field>
+            <field name="res_model">sale.order</field>
+            <field name="view_type">form</field>
+            <field name="view_mode">tree,kanban,form,calendar</field>
+            <!--<field name="context">{"search_default_Customer_Not_COD_Sale_Order":True}</field>-->
+            <field name="domain">[('x_Sale_Order_In_Transit_State','=','InTransit')]</field>
+            <!--<field name="view_id" ref="crm_unassigned_call_center_sale_order" />-->
+            <field name="view_ids" eval="[(5, 0, 0),
+                                           (0, 0, {'view_mode': 'tree','view_id': ref('customer_portal_sales_orders_tree')}),
+                                           (0, 0, {'view_mode': 'form', 'view_id': ref('customer_portal_sales_orders_form')})
+                                            ]"/>
+
+        </record>
+
+        <record model="ir.actions.act_window" id="action_courier_COD_recieved_sale_order">
+            <field name="name">Courier COD Recieved</field>
+            <field name="type">ir.actions.act_window</field>
+            <field name="res_model">sale.order</field>
+            <field name="view_type">form</field>
+            <field name="view_mode">tree,kanban,form,calendar</field>
+            <!--<field name="context">{"search_default_Customer_Not_COD_Sale_Order":True}</field>-->
+            <field name="domain">
+                [('x_Sale_Order_Delivered_State','=','delivered'),('x_Sale_Order_COD_Done','=',False)]
+            </field>
+            <field name="context">{'group_by':['x_sale_order_driver_name']}</field>
+            <!--<field name="view_id" ref="crm_unassigned_call_center_sale_order" />-->
+            <field name="view_ids" eval="[(5, 0, 0),
+                                           (0, 0, {'view_mode': 'tree','view_id': ref('courier_COD_recieved_sale_order')}),
+                                           (0, 0, {'view_mode': 'form', 'view_id': ref('customer_portal_sales_orders_form')})
+                                            ]"/>
+
+        </record>
+
+        <record model="ir.actions.act_window" id="action_client_create_manual_order_form">
+            <field name="name">Client Create Orders</field>
+            <field name="type">ir.actions.act_window</field>
+            <field name="res_model">create.manual.order</field>
+            <field name="view_type">form</field>
+            <field name="view_mode">form</field>
+            <field name="view_ids"
+                   eval="[(5, 0, 0),(0, 0, {'view_mode': 'form', 'view_id': ref('client_create_manual_order_form')})]"/>
+        </record>
+
+
+        <record model="ir.actions.act_window" id="action_client_all_invoices">
+            <field name="name">All Invoices</field>
+            <field name="type">ir.actions.act_window</field>
+            <field name="res_model">account.sale.invoice</field>
+            <field name="view_type">form</field>
+            <field name="view_mode">tree,form</field>
+            <field name="view_ids" eval="[(5, 0, 0),
+                                           (0, 0, {'view_mode': 'tree','view_id': ref('client_account_invoice_sale_tree')}),
+                                           (0, 0, {'view_mode': 'form', 'view_id': ref('client_account_invoice_sale_form')})
+                                            ]"/>
+
+        </record>
+
+        <record model="ir.actions.act_window" id="action_customer_portal_sales_orders_tree">
+            <field name="name">Orders Portal</field>
+            <field name="type">ir.actions.act_window</field>
+            <field name="res_model">sale.order</field>
+            <field name="view_type">form</field>
+            <field name="view_mode">tree,kanban,form,calendar,graph,pivot</field>
+            <!--<field name="context"></field>-->
+            <!--<field name="view_id" ref="crm_unassigned_call_center_sale_order" />-->
+            <field name="view_ids" eval="[(5, 0, 0),
+                                           (0, 0, {'view_mode': 'tree','view_id': ref('customer_portal_sales_orders_tree')}),
+                                           (0, 0, {'view_mode': 'form', 'view_id': ref('customer_portal_sales_orders_form')})
+                                            ]"/>
+
+        </record>
+
+        <record model="ir.actions.act_window" id="action_crm_first_call_center_sale_order">
+            <field name="name">CRM Call Center First Call Sales Orders</field>
+            <field name="type">ir.actions.act_window</field>
+            <field name="res_model">sale.order</field>
+            <field name="view_type">form</field>
+            <field name="view_mode">tree,kanban,form,calendar</field>
+            <!--<field name="context">{"search_default_Sale_Order_First_Call":True}</field>-->
+            <field name="domain">
+                [('x_Sale_Order_First_Call_State','=','firstCall'),('x_Sale_Order_Delivered_State','!=','delivered')]
+            </field>
+            <!--<field name="view_id" ref="crm_unassigned_call_center_sale_order" />-->
+            <field name="view_ids" eval="[(5, 0, 0),
+                                           (0, 0, {'view_mode': 'tree','view_id': ref('crm_unassigned_call_center_sale_order')}),
+                                           (0, 0, {'view_mode': 'form', 'view_id': ref('crm_unassigned_call_center_sale_order_form')})
+                                            ]"/>
+        </record>
+
+        <record model="ir.actions.act_window" id="action_crm_second_call_center_sale_order">
+            <field name="name">CRM Call Center Second Call Sales Orders</field>
+            <field name="type">ir.actions.act_window</field>
+            <field name="res_model">sale.order</field>
+            <field name="view_type">form</field>
+            <field name="view_mode">tree,kanban,form,calendar</field>
+            <!--<field name="context">{"search_default_Sale_Order_Second_Call":True}</field>-->
+            <field name="domain">
+                [('x_Sale_Order_First_Call_State','=','secondCall'),('x_Sale_Order_Delivered_State','!=','delivered')]
+            </field>
+            <!--<field name="view_id" ref="crm_unassigned_call_center_sale_order" />-->
+            <field name="view_ids" eval="[(5, 0, 0),
+                                           (0, 0, {'view_mode': 'tree','view_id': ref('crm_unassigned_call_center_sale_order')}),
+                                           (0, 0, {'view_mode': 'form', 'view_id': ref('crm_unassigned_call_center_sale_order_form')})
+                                            ]"/>
+        </record>
+
+        <record model="ir.actions.act_window" id="action_crm_third_call_center_sale_order">
+            <field name="name">CRM Call Center Third Call Sales Orders</field>
+            <field name="type">ir.actions.act_window</field>
+            <field name="res_model">sale.order</field>
+            <field name="view_type">form</field>
+            <field name="view_mode">tree,kanban,form,calendar</field>
+            <!--<field name="context">{"search_default_Sale_Order_Third_Call":True}</field>-->
+            <field name="domain">
+                [('x_Sale_Order_First_Call_State','=','thirdCall'),('x_Sale_Order_Delivered_State','!=','delivered')]
+            </field>
+            <!--<field name="view_id" ref="crm_unassigned_call_center_sale_order" />-->
+            <field name="view_ids" eval="[(5, 0, 0),
+                                           (0, 0, {'view_mode': 'tree','view_id': ref('crm_unassigned_call_center_sale_order')}),
+                                           (0, 0, {'view_mode': 'form', 'view_id': ref('crm_unassigned_call_center_sale_order_form')})
+                                            ]"/>
+        </record>
+
+        <record model="ir.actions.act_window" id="action_crm_fourth_call_center_sale_order">
+            <field name="name">CRM Call Center Fourth Call Sales Orders</field>
+            <field name="type">ir.actions.act_window</field>
+            <field name="res_model">sale.order</field>
+            <field name="view_type">form</field>
+            <field name="view_mode">tree,kanban,form,calendar</field>
+            <!--<field name="context">{"search_default_Sale_Order_Fourth_Call":True}</field>-->
+            <!--<field name="view_id" ref="crm_unassigned_call_center_sale_order" />-->
+            <field name="domain">
+                [('x_Sale_Order_First_Call_State','=','fourthCall'),('x_Sale_Order_Delivered_State','!=','delivered')]
+            </field>
+            <field name="view_ids" eval="[(5, 0, 0),
+                                           (0, 0, {'view_mode': 'tree','view_id': ref('crm_unassigned_call_center_sale_order')}),
+                                           (0, 0, {'view_mode': 'form', 'view_id': ref('crm_unassigned_call_center_sale_order_form')})
+                                            ]"/>
+        </record>
+
+        <record model="ir.actions.act_window" id="action_account_invoice_sale_all">
+            <field name="name">Account Sale Invoice All</field>
+            <field name="type">ir.actions.act_window</field>
+            <field name="res_model">account.sale.invoice</field>
+            <field name="view_type">form</field>
+            <field name="view_mode">tree,form</field>
+            <field name="context">{'group_by':['partner_id']}</field>
+            <!--<field name="context">{"search_default_Customer_Not_COD_Sale_Order":True}</field>-->
+            <!--<field name="domain">[('x_Sale_Order_Delivered_State','=','delivered'),('x_Sale_Order_COD_Done','=',False)]</field>-->
+            <!--<field name="context">{'group_by':['x_sale_order_driver_name']}</field>-->
+            <!--<field name="view_id" ref="crm_unassigned_call_center_sale_order" />-->
+            <field name="view_ids" eval="[(5, 0, 0),
+                                           (0, 0, {'view_mode': 'tree','view_id': ref('account_invoice_sale_tree')}),
+                                           (0, 0, {'view_mode': 'form', 'view_id': ref('account_invoice_sale_form')})
+                                            ]"/>
+
+        </record>
+
+        <record model="ir.actions.act_window" id="action_crm_call_center_delivered_sale_order">
+            <field name="name">CRM Call Center Delivered Sales Orders</field>
+            <field name="type">ir.actions.act_window</field>
+            <field name="res_model">sale.order</field>
+            <field name="view_type">form</field>
+            <field name="view_mode">tree,kanban,form,calendar</field>
+            <!--<field name="context">{"search_default_Sale_Order_First_Call":True}</field>-->
+            <field name="domain">[('x_Sale_Order_Delivered_State','=','delivered')]</field>
+            <!--<field name="view_id" ref="crm_unassigned_call_center_sale_order" />-->
+            <field name="view_ids" eval="[(5, 0, 0),
+                                           (0, 0, {'view_mode': 'tree','view_id': ref('crm_unassigned_call_center_sale_order')}),
+                                           (0, 0, {'view_mode': 'form', 'view_id': ref('crm_unassigned_call_center_sale_order_form')})
+                                            ]"/>
+        </record>
+
+        <record model="ir.actions.act_window" id="action_crm_call_center_not_delivered_sale_order">
+            <field name="name">CRM Call Center Not Delivered Sales Orders</field>
+            <field name="type">ir.actions.act_window</field>
+            <field name="res_model">sale.order</field>
+            <field name="view_type">form</field>
+            <field name="view_mode">tree,kanban,form,calendar</field>
+            <!--<field name="context">{"search_default_Sale_Order_First_Call":True}</field>-->
+            <field name="domain">[('x_Sale_Order_Delivered_State','=','notDelivered')]</field>
+            <!--<field name="view_id" ref="crm_unassigned_call_center_sale_order" />-->
+            <field name="view_ids" eval="[(5, 0, 0),
+                                           (0, 0, {'view_mode': 'tree','view_id': ref('crm_unassigned_call_center_sale_order')}),
+                                           (0, 0, {'view_mode': 'form', 'view_id': ref('crm_unassigned_call_center_sale_order_form')})
+                                            ]"/>
+        </record>
+
+        <record model="ir.actions.act_window" id="action_crm_call_center_picked_sale_order">
+            <field name="name">CRM Call Center Picked Sales Orders</field>
+            <field name="type">ir.actions.act_window</field>
+            <field name="res_model">sale.order</field>
+            <field name="view_type">form</field>
+            <field name="view_mode">tree,kanban,form,calendar</field>
+            <!--<field name="context">{"search_default_Sale_Order_First_Call":True}</field>-->
+            <field name="domain">[('x_Sale_Order_In_Transit_State','=','Picked')]</field>
+            <!--<field name="view_id" ref="crm_unassigned_call_center_sale_order" />-->
+            <field name="view_ids" eval="[(5, 0, 0),
+                                           (0, 0, {'view_mode': 'tree','view_id': ref('crm_unassigned_call_center_sale_order')}),
+                                           (0, 0, {'view_mode': 'form', 'view_id': ref('crm_unassigned_call_center_sale_order_form')})
+                                            ]"/>
+        </record>
+
+        <record model="ir.actions.act_window" id="action_crm_call_center_request_for_cancel_sale_order">
+            <field name="name">CRM Call Center Request For Cancel Sales Orders</field>
+            <field name="type">ir.actions.act_window</field>
+            <field name="res_model">sale.order</field>
+            <field name="view_type">form</field>
+            <field name="view_mode">tree,kanban,form,calendar</field>
+            <!--<field name="context">{"search_default_Sale_Order_First_Call":True}</field>-->
+            <field name="domain">[('x_Sale_Order_Req_For_Cancel_State','=','requestForCancel')]</field>
+            <!--<field name="view_id" ref="crm_unassigned_call_center_sale_order" />-->
+            <field name="view_ids" eval="[(5, 0, 0),
+                                           (0, 0, {'view_mode': 'tree','view_id': ref('crm_unassigned_call_center_sale_order')}),
+                                           (0, 0, {'view_mode': 'form', 'view_id': ref('crm_unassigned_call_center_sale_order_form')})
+                                            ]"/>
+        </record>
+
+        <record model="ir.actions.act_window" id="action_crm_call_center_not_scheduled_sale_order">
+            <field name="name">CRM Call Center Not Scheduled Sales Orders</field>
+            <field name="type">ir.actions.act_window</field>
+            <field name="res_model">sale.order</field>
+            <field name="view_type">form</field>
+            <field name="view_mode">tree,kanban,form,calendar</field>
+            <!--<field name="context">{"search_default_Sale_Order_First_Call":True}</field>-->
+            <field name="domain">[('x_Sale_Order_Scheduled_State','=','NotScheduled')]</field>
+            <!--<field name="view_id" ref="crm_unassigned_call_center_sale_order" />-->
+            <field name="view_ids" eval="[(5, 0, 0),
+                                           (0, 0, {'view_mode': 'tree','view_id': ref('crm_unassigned_call_center_sale_order')}),
+                                           (0, 0, {'view_mode': 'form', 'view_id': ref('crm_unassigned_call_center_sale_order_form')})
+                                            ]"/>
+        </record>
+
+        <record model="ir.actions.act_window" id="action_crm_call_center_scheduled_sale_order">
+            <field name="name">CRM Call Center Scheduled Sales Orders</field>
+            <field name="type">ir.actions.act_window</field>
+            <field name="res_model">sale.order</field>
+            <field name="view_type">form</field>
+            <field name="view_mode">tree,kanban,form,calendar</field>
+            <!--<field name="context">{"search_default_Sale_Order_First_Call":True}</field>-->
+            <field name="domain">[('x_Sale_Order_Scheduled_State','=','Scheduled')]</field>
+            <!--<field name="view_id" ref="crm_unassigned_call_center_sale_order" />-->
+            <field name="view_ids" eval="[(5, 0, 0),
+                                           (0, 0, {'view_mode': 'tree','view_id': ref('crm_unassigned_call_center_sale_order')}),
+                                           (0, 0, {'view_mode': 'form', 'view_id': ref('crm_unassigned_call_center_sale_order_form')})
+                                            ]"/>
+        </record>
+
+        <menuitem id="menu_CRM_root" name="CRM" sequence="8"/>
+        <menuitem id="menu_sales_orders_FLHeader" name="Sales Orders" parent="menu_CRM_root" sequence="113"/>
+        <menuitem id="menu_crm_picked_SalesOrders" name="Picked Orders" parent="menu_sales_orders_FLHeader"
+                  action="action_crm_call_center_picked_sale_order" sequence="114"/>
+        <menuitem id="menu_crm_not_scheduled_SalesOrders" name="Not Scheduled Orders"
+                  parent="menu_sales_orders_FLHeader" action="action_crm_call_center_not_scheduled_sale_order"
+                  sequence="115"/>
+        <menuitem id="menu_crm_scheduled_SalesOrders" name="Scheduled Orders" parent="menu_sales_orders_FLHeader"
+                  action="action_crm_call_center_scheduled_sale_order" sequence="116"/>
+        <menuitem id="menu_crm_not_delivered_SalesOrders" name="Not Delivered Orders"
+                  parent="menu_sales_orders_FLHeader" action="action_crm_call_center_not_delivered_sale_order"
+                  sequence="117"/>
+        <menuitem id="menu_crm_delivered_SalesOrders" name="Delivered Orders" parent="menu_sales_orders_FLHeader"
+                  action="action_crm_call_center_delivered_sale_order" sequence="118"/>
+        <menuitem id="menu_crm_request_for_cancel_SalesOrders" name="Request For Cancel Orders"
+                  parent="menu_sales_orders_FLHeader" action="action_crm_call_center_request_for_cancel_sale_order"
+                  sequence="119"/>
+
+        <menuitem id="menu_call_center_FLHeader" name="Call Center" parent="menu_CRM_root" sequence="120"/>
+        <menuitem id="menu_call_center_unassigned_SalesOrders" name="Unassigned Orders"
+                  parent="menu_call_center_FLHeader" action="action_crm_unassigned_call_center_sale_order"
+                  sequence="121"/>
+        <menuitem id="menu_call_center_1st_call_SalesOrders" name="1st Call Orders" parent="menu_call_center_FLHeader"
+                  action="action_crm_first_call_center_sale_order" sequence="122"/>
+        <menuitem id="menu_call_center_2nd_call_SalesOrders" name="2nd Call Orders" parent="menu_call_center_FLHeader"
+                  action="action_crm_second_call_center_sale_order" sequence="123"/>
+        <menuitem id="menu_call_center_3rd_call_SalesOrders" name="3rd Call Orders" parent="menu_call_center_FLHeader"
+                  action="action_crm_third_call_center_sale_order" sequence="124"/>
+        <menuitem id="menu_call_center_4th_call_SalesOrders" name="4th Call Orders" parent="menu_call_center_FLHeader"
+                  action="action_crm_fourth_call_center_sale_order" sequence="125"/>
+        <menuitem id="menu_call_center_not_reached_call_SalesOrders" name="Not Reached Orders"
+                  parent="menu_call_center_FLHeader" action="action_crm_not_reached_call_center_sale_order"
+                  sequence="126"/>
+
+
+        <menuitem id="menu_client_orders_root" name="Client Orders" sequence="56"/>
+        <menuitem id="menu_client_orders_orders" name="Orders" parent="menu_client_orders_root" sequence="56"/>
+        <menuitem id="menu_client_orders_orders_create_manual_orders" name="Create Manual Orders"
+                  parent="menu_client_orders_orders" action="action_client_create_manual_order_form" sequence="1"/>
+        <menuitem id="menu_client_orders_orders_new_orders" name="New Orders" parent="menu_client_orders_orders"
+                  action="action_customer_portal_New_sales_orders_tree" sequence="2"/>
+        <menuitem id="menu_client_orders_orders_all_orders" name="All Orders" parent="menu_client_orders_orders"
+                  action="action_customer_portal_sales_orders_tree" sequence="3"/>
+        <menuitem id="menu_client_orders_orders_scheduled_orders" name="Scheduled Orders"
+                  parent="menu_client_orders_orders" action="action_customer_portal_Scheduled_sales_orders_tree"
+                  sequence="4"/>
+        <menuitem id="menu_client_orders_orders_not_scheduled_orders" name="Not Scheduled Orders"
+                  parent="menu_client_orders_orders" action="action_customer_portal_Not_Scheduled_sales_orders_tree"
+                  sequence="5"/>
+        <menuitem id="menu_client_orders_orders_cod_orders" name="COD Orders" parent="menu_client_orders_orders"
+                  action="action_customer_portal_COD_sales_orders_tree" sequence="6"/>
+        <menuitem id="menu_client_orders_orders_not_cod_orders" name="Not COD Orders" parent="menu_client_orders_orders"
+                  action="action_customer_portal_Not_COD_sales_orders_tree" sequence="7"/>
+        <menuitem id="menu_client_orders_orders_reversed_orders" name="Reversed Orders"
+                  parent="menu_client_orders_orders" action="action_customer_portal_Reversed_sales_orders_tree"
+                  sequence="8"/>
+
+
+        <menuitem id="menu_client_invoices_root" name="Client Invoices" sequence="59"/>
+        <menuitem id="menu_client_invoices_invoices" name="Invoices" parent="menu_client_invoices_root" sequence="59"/>
+        <menuitem id="menu_client_invoices_invoices_all_invoices" name="All Invoices"
+                  parent="menu_client_invoices_invoices" action="action_client_all_invoices" sequence="1"/>
+
+
+        <menuitem id="menu_crm_reports_FLHeader" name="Reports" parent="menu_CRM_root" sequence="127"/>
+        <menuitem id="menu_crm_reports_all_orders" name="All Orders" parent="menu_crm_reports_FLHeader"
+                  action="action_report_sale_order_tree" sequence="128"/>
+
+        <!--<record id="view_account_invoice_custom" model="ir.ui.view">
+            <field name="name">account.invoice.custom.form.inherited</field>
+            <field name="model">account.invoice</field>
+            <field name="inherit_id" ref="account.invoice_form"/>
+            <field name="arch" type="xml">
+                <xpath expr="/form/header/button[@name='action_invoice_draft']" position="after">
+                    <button name="validate_invoice_amount" string="Validate Invoice Amount" class="oe_highlight"
+                            attrs="{'invisible':[('state','=', 'paid')]}"/>
+                </xpath>
+                <xpath expr="//field[@name='amount_untaxed']" position="before">
+                    <field name="invoice_validated" />
+                    <field name="cash_on_delivery"/>
+                    <field name="test_field" invisible="1"/>
+                </xpath>
+           </field>
+        </record>-->
+
+
+        <record model="ir.ui.view" id="invoiced_sales_orders_form">
+            <field name="name">invoiced.sales.orders.form</field>
+            <field name="model">sale.order</field>
+            <field name="type">form</field>
+            <field name="arch" type="xml">
+                <form string="Sales Order" class="o_sale_order" create="false" edit="false">
+                    <header>
+                        <!--<button name="302" string="Create Invoice" type="action" class="btn-primary" attrs="{'invisible': [('invoice_status', '!=', 'to invoice')]}"/>
+                        <button name="302" string="Create Invoice" type="action" context="{'default_advance_payment_method': 'percentage'}" attrs="{'invisible': ['|',('invoice_status', '!=', 'no'), ('state', '!=', 'sale')]}"/>-->
+                        <button name="action_quotation_send" string="Send by Email" type="object" states="draft"
+                                class="btn-primary"/>
+                        <button name="print_quotation" string="Print" type="object" states="draft" class="btn-primary"/>
+                        <!--<button name="action_confirm" states="sent" string="Confirm Sale" class="btn-primary o_sale_confirm" type="object"/>-->
+                        <!--<button name="action_confirm" states="draft" string="Confirm Sale" class="o_sale_confirm" type="object"/>-->
+                        <button name="print_quotation" string="Print" type="object" states="sent,sale"/>
+                        <button name="action_quotation_send" string="Send by Email" type="object" states="sent,sale"/>
+                        <!--<button name="action_cancel" states="draft,sent,sale" type="object" string="Cancel"/>
+                        <button name="action_draft" states="cancel" type="object" string="Set to Quotation"/>
+                        <button name="action_done" type="object" string="Lock" states="sale" help="If the sale is locked, you can not modify it anymore. However, you will still be able to invoice or deliver."/>-->
+                        <field name="state" widget="statusbar" statusbar_visible="draft,sent,sale"/>
+                    </header>
+                    <div style="background-image:linear-gradient(to bottom, #fcfcfc, #dedede)" class="text-right">
+                        <field name="x_Sale_Order_In_Transit_State" widget="statusbar"
+                               statusbar_visible="InTransit,Picked,RecievedinWarehouse,shelved,readyForDispatch,dispatched"/>
+                        <br/>
+                        <field name="x_Sale_Order_Scheduled_State" widget="statusbar"
+                               statusbar_visible="none,NotScheduled,Scheduled,,,,"/>
+                        <br/>
+                        <field name="x_Sale_Order_First_Call_State" widget="statusbar"
+                               statusbar_visible="none,firstCall,secondCall,thirdCall,fourthCall,,"/>
+                        <br/>
+                        <field name="x_Sale_Order_First_OFD_State" widget="statusbar"
+                               statusbar_visible="none,firstOfd,firstRto,secondOfd,onHold,readyToDispatchToSender,inTransitBackToSender,returnToSender"/>
+                        <br/>
+                        <field name="x_Sale_Order_Delivered_State" widget="statusbar"
+                               statusbar_visible="none,delivered,notDelivered"/>
+                        <br/>
+                        <field name="x_Sale_Order_Req_For_Cancel_State" widget="statusbar"
+                               statusbar_visible="none,requestForCancel,readyToDispatch,cancelOrderInTransit,cancelOrderReturned"/>
+                    </div>
+                    <sheet>
+                        <div class="oe_button_box" name="button_box">
+                            <button name="action_view_invoice" type="object" class="oe_stat_button"
+                                    icon="fa-pencil-square-o" attrs="{'invisible': [('invoice_count', '=', 0)]}">
+                                <field name="invoice_count" widget="statinfo" string="Invoices"/>
+                            </button>
+                        </div>
+                        <div class="oe_title">
+                            <h1>
+                                Order Ref. #
+                                <field name="name" readonly="1"/>
+                                <field name="img_attach"/>
+                            </h1>
+                        </div>
+                        <div>
+                            <field name="img_QR"/>
+                        </div>
+                        <group>
+                            <group>
+                                <field name="partner_id" domain="[('customer','=',True)]"
+                                       context="{'search_default_customer':1, 'show_address': 1}"
+                                       options="{&quot;always_reload&quot;: True}"/>
+                                <field name="partner_invoice_id" groups="sale.group_delivery_invoice_address"
+                                       context="{'default_type':'invoice'}"/>
+                                <field name="partner_shipping_id" groups="sale.group_delivery_invoice_address"
+                                       context="{'default_type':'delivery'}"/>
+                                <field name="x_Sale_Order_Customer_name"/>
+                                <field name="x_Sale_order_Mobile_No"/>
+                                <field name="x_Sale_Order_Phone_Number"/>
+                                <field name="x_sale_order_shipping_address"/>
+                                <field name="x_Sale_Order_Cust_Comment"/>
+                            </group>
+                            <group>
+                                <field name="create_date"/>
+                                <field name="date_order"
+                                       attrs="{'invisible': [('state', 'in', ['sale', 'done', 'cancel'])]}"/>
+                                <field name="validity_date" attrs="{'invisible': [('state', 'in', ['sale', 'done'])]}"/>
+                                <field name="confirmation_date"
+                                       attrs="{'invisible': [('state', 'in', ['draft', 'sent', 'cancel'])]}"/>
+                                <field name="pricelist_id" groups="product.group_sale_pricelist"/>
+                                <field name="currency_id" invisible="1"/>
+                                <field name="payment_term_id" options="{'no_create': True}"/>
+                                <newline/>
+                                <!--<field name="x_Sale_Order_Cash" widget="monetary" on_change="sale_order_cash_on_delivery_OnChange(x_Sale_Order_Cash)" />-->
+                                <field name="x_Sale_Order_COD"/>
+                                <field name="x_Sale_Order_COD_Done"/>
+                                <field name="reversed_order"/>
+                                <field name="x_sale_order_driver_name"/>
+                                <field name="x_sale_order_picking_driver_name"/>
+                                <field name="x_Sale_Order_Cust_Prod"/>
+                            </group>
+                        </group>
+                        <notebook>
+                            <page string="Order Lines">
+                                <field name="order_line" mode="tree,kanban"
+                                       attrs="{'readonly': [('state', 'in', ('done','cancel'))]}">
+                                    <form string="Sales Order Lines">
+                                        <group>
+                                            <group>
+                                                <field name="product_id"
+                                                       context="{'partner_id':parent.partner_id, 'quantity':product_uom_qty, 'pricelist':parent.pricelist_id, 'uom':product_uom, 'company_id': parent.company_id}"
+                                                       attrs="{'readonly': ['|', ('qty_invoiced', '&gt;', 0)]}"/>
+                                                <!--<field name="layout_category_id" groups="sale.group_sale_layout"/>-->
+                                                <field name="invoice_status" invisible="1"/>
+                                                <field name="qty_to_invoice" invisible="1"/>
+                                                <!--<field name="qty_delivered_updateable" invisible="1"/>-->
+                                                <!--<field name="procurement_ids" invisible="1"/>-->
+                                                <field name="price_subtotal" invisible="1"/>
+                                                <label for="product_uom_qty" string="Ordered Quantity"/>
+                                                <div>
+                                                    <field context="{'partner_id':parent.partner_id, 'quantity':product_uom_qty, 'pricelist':parent.pricelist_id, 'uom':product_uom, 'uom_qty_change':True, 'company_id': parent.company_id}"
+                                                           name="product_uom_qty" class="oe_inline"/>
+                                                    <field name="product_uom" groups="product.group_uom"
+                                                           class="oe_inline oe_no_button"
+                                                           attrs="{'readonly': [('state', 'in', ('sale','done', 'cancel'))]}"/>
+                                                </div>
+                                                <label for="qty_delivered" string="Delivered Quantity"
+                                                       invisible="context.get('hide_sale')"/>
+                                                <div invisible="context.get('hide_sale')">
+                                                    <field name="qty_delivered"/>
+                                                </div>
+                                                <label for="qty_invoiced" string="Invoiced Quantity"
+                                                       invisible="context.get('hide_sale')"/>
+                                                <div invisible="context.get('hide_sale')">
+                                                    <field name="qty_invoiced" invisible="context.get('hide_sale')"/>
+                                                </div>
+                                                <field name="price_unit"/>
+                                                <label for="discount" groups="sale.group_discount_per_so_line"/>
+                                                <div name="discount" groups="sale.group_discount_per_so_line">
+                                                    <field name="discount" class="oe_inline"/>
+                                                    %
+                                                </div>
+                                            </group>
+                                            <group>
+                                                <field name="tax_id" widget="many2many_tags"
+                                                       domain="[('type_tax_use','=','sale'),('company_id','=',parent.company_id)]"
+                                                       attrs="{'readonly': [('qty_invoiced', '&gt;', 0)]}"/>
+                                                <label for="customer_lead"/>
+                                                <div>
+                                                    <field name="customer_lead" class="oe_inline"/>
+                                                    days
+                                                </div>
+                                                <label for="analytic_tag_ids"
+                                                       groups="analytic.group_analytic_accounting"/>
+                                                <div>
+                                                    <field name="analytic_tag_ids" widget="many2many_tags"
+                                                           groups="analytic.group_analytic_accounting"/>
+                                                </div>
+                                            </group>
+                                        </group>
+                                        <label for="name"/>
+                                        <field name="name"/>
+                                        <div groups="base.group_no_one">
+                                            <label for="invoice_lines"/>
+                                            <field name="invoice_lines"/>
+                                        </div>
+                                        <field name="state" invisible="1"/>
+                                    </form>
+                                    <tree string="Sales Order Lines" editable="bottom"
+                                          decoration-info="invoice_status=='to invoice'">
+                                        <field name="sequence" widget="handle"/>
+                                        <field name="product_id"
+                                               attrs="{'readonly': ['|', ('qty_invoiced', '&gt;', 0)]}"
+                                               context="{'partner_id':parent.partner_id, 'quantity':product_uom_qty, 'pricelist':parent.pricelist_id, 'uom':product_uom, 'company_id': parent.company_id}"/>
+                                        <!--<field name="layout_category_id" groups="sale.group_sale_layout"/>-->
+                                        <field name="name"/>
+                                        <field name="product_uom_qty" string="Ordered Qty"
+                                               context="{'partner_id':parent.partner_id, 'quantity':product_uom_qty, 'pricelist':parent.pricelist_id, 'uom':product_uom, 'company_id': parent.company_id}"/>
+                                        <field name="qty_delivered" invisible="context.get('hide_sale')"/>
+                                        <field name="qty_invoiced" invisible="context.get('hide_sale')"/>
+                                        <field name="qty_to_invoice" invisible="1"/>
+                                        <field name="product_uom"
+                                               attrs="{'readonly': [('state', 'in', ('sale','done', 'cancel'))]}"
+                                               context="{'company_id': parent.company_id}" groups="product.group_uom"
+                                               options="{&quot;no_open&quot;: True}"/>
+                                        <field name="analytic_tag_ids" groups="analytic.group_analytic_accounting"
+                                               widget="many2many_tags"/>
+                                        <field name="price_unit" attrs="{'readonly': [('qty_invoiced', '&gt;', 0)]}"/>
+                                        <field name="tax_id" widget="many2many_tags"
+                                               domain="[('type_tax_use','=','sale'),('company_id','=',parent.company_id)]"
+                                               attrs="{'readonly': [('qty_invoiced', '&gt;', 0)]}"/>
+                                        <field name="discount" groups="sale.group_discount_per_so_line"/>
+                                        <field name="price_subtotal" widget="monetary"
+                                               groups="sale.group_show_price_subtotal"/>
+                                        <field name="price_total" widget="monetary"
+                                               groups="sale.group_show_price_total"/>
+                                        <!--<field name="qty_delivered_updateable" invisible="1"/>-->
+                                        <!--<field name="procurement_ids" invisible="1"/>-->
+                                        <field name="state" invisible="1"/>
+                                        <field name="invoice_status" invisible="1"/>
+                                        <field name="customer_lead" invisible="1"/>
+                                        <field name="currency_id" invisible="1"/>
+                                    </tree>
+                                    <kanban class="o_kanban_mobile">
+                                        <field name="product_id"/>
+                                        <field name="product_uom_qty"/>
+                                        <field name="product_uom" groups="product.group_uom"/>
+                                        <field name="price_subtotal"/>
+                                        <templates>
+                                            <t t-name="kanban-box">
+                                                <div t-attf-class="oe_kanban_card oe_kanban_global_click">
+                                                    <div class="row">
+                                                        <div class="col-xs-12">
+                                                            <strong>
+                                                                <span>
+                                                                    <t t-esc="record.product_id.value"/>
+                                                                </span>
+                                                            </strong>
+                                                        </div>
+                                                    </div>
+                                                    <div class="row">
+                                                        <div class="col-xs-8 text-muted">
+                                                            <span>
+                                                                <t t-esc="record.product_uom_qty.value"/>
+                                                                <t t-esc="record.product_uom.value"/>
+                                                            </span>
+                                                        </div>
+                                                        <div class="col-xs-4 text-muted">
+                                                            <span class="pull-right text-right">
+                                                                <t t-esc="record.price_subtotal.value"/>
+                                                            </span>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </t>
+                                        </templates>
+                                    </kanban>
+                                </field>
+                                <group class="oe_subtotal_footer oe_right" colspan="2" name="sale_total">
+                                    <field name="x_Sale_Order_Cash" widget="monetary"
+                                           options="{'currency_field': 'currency_id'}"/>
+                                    <field name="order_fees_discount_percentage"/>
+                                    <field name="cod_fees_discount_percentage"/>
+                                    <field name="delivery_repriced" widget="monetary"
+                                           options="{'currency_field': 'currency_id'}"/>
+                                    <field name="cod_fees"/>
+                                    <field name="tax_repriced" widget="monetary"
+                                           options="{'currency_field': 'currency_id'}"/>
+                                    <field name="vat_tax"/>
+                                    <field name="amount_vat_tax"/>
+                                    <div class="oe_subtotal_footer_separator oe_inline o_td_label">
+                                        <label for="total_cash"/>
+                                        <button name="button_dummy" states="draft,sent" string="(update)" type="object"
+                                                class="oe_edit_only oe_link"/>
+                                    </div>
+                                    <field name="total_cash" nolabel="1" class="oe_subtotal_footer_separator"
+                                           widget="monetary" options="{'currency_field': 'currency_id'}"/>
+                                </group>
+                                <field name="note" class="oe_inline"
+                                       placeholder="Setup default terms and conditions in your company settings."/>
+                                <div class="oe_clear"/>
+                            </page>
+                            <page string="Other Information">
+                                <group>
+                                    <group string="Sales Information" name="sales_person">
+                                        <field name="user_id"/>
+                                        <field name="team_id" options="{'no_create': True}"/>
+                                        <field name="client_order_ref"/>
+                                        <field name="company_id" options="{'no_create': True}"
+                                               groups="base.group_multi_company"/>
+                                        <!--<field name="project_ids" attrs="{'invisible':[('state','=','sale')]}"
+                                               context="{'default_partner_id':partner_invoice_id, 'default_name':name}"
+                                               groups="analytic.group_analytic_accounting"/>-->
+                                        <!--<field name="related_project_id"
+                                               attrs="{'readonly': ['|',('project_ids','!=',False),('invoice_count','!=',0),('state','=','sale')],'invisible':[('state','!=','sale')]}"
+                                               context="{'default_partner_id':partner_invoice_id, 'default_name':name}"
+                                               groups="analytic.group_analytic_accounting"/>-->
+                                    </group>
+                                    <group name="sale_pay" string="Invoicing">
+                                        <field name="fiscal_position_id" options="{'no_create': True}"/>
+                                        <field name="invoice_status"
+                                               attrs="{'invisible': [('state', 'not in', ('sale','done'))]}"/>
+                                    </group>
+                                    <group string="Reporting" name="technical" groups="base.group_no_one">
+                                        <field groups="base.group_no_one" name="origin"/>
+                                    </group>
+                                </group>
+                            </page>
+                        </notebook>
+                    </sheet>
+                    <div class="oe_chatter">
+                        <field name="message_follower_ids" widget="mail_followers"/>
+                        <field name="activity_ids" widget="mail_activity"/>
+                        <field name="message_ids" widget="mail_thread"/>
+                    </div>
+                </form>
+            </field>
+        </record>
+
+        <record model="ir.ui.view" id="sales_orders_quotation_custom_form">
+            <field name="name">quotations.orders.custom.form</field>
+            <field name="model">sale.order</field>
+            <field name="type">form</field>
+            <field name="arch" type="xml">
+                <form string="Sales Order" class="o_sale_order" create="false" edit="false">
+                    <header>
+                        <!--<button name="302" string="Create Invoice" type="action" class="btn-primary" attrs="{'invisible': [('invoice_status', '!=', 'to invoice')]}"/>
+                        <button name="302" string="Create Invoice" type="action" context="{'default_advance_payment_method': 'percentage'}" attrs="{'invisible': ['|',('invoice_status', '!=', 'no'), ('state', '!=', 'sale')]}"/>-->
+                        <button name="action_quotation_send" string="Send by Email" type="object" states="draft"
+                                class="btn-primary"/>
+                        <button name="print_quotation" string="Print" type="object" states="draft" class="btn-primary"/>
+                        <!--<button name="action_confirm" states="sent" string="Confirm Sale" class="btn-primary o_sale_confirm" type="object"/>-->
+                        <!--<button name="action_confirm" states="draft" string="Confirm Sale" class="o_sale_confirm" type="object"/>-->
+                        <button name="print_quotation" string="Print" type="object" states="sent,sale"/>
+                        <button name="action_quotation_send" string="Send by Email" type="object" states="sent,sale"/>
+                        <!--<button name="action_cancel" states="draft,sent,sale" type="object" string="Cancel"/>
+                        <button name="action_draft" states="cancel" type="object" string="Set to Quotation"/>
+                        <button name="action_done" type="object" string="Lock" states="sale" help="If the sale is locked, you can not modify it anymore. However, you will still be able to invoice or deliver."/>-->
+                        <field name="state" widget="statusbar" statusbar_visible="draft,sent,sale"/>
+                    </header>
+                    <div style="background-image:linear-gradient(to bottom, #fcfcfc, #dedede)" class="text-right">
+                        <field name="x_Sale_Order_In_Transit_State" widget="statusbar"
+                               statusbar_visible="InTransit,Picked,RecievedinWarehouse,shelved,readyForDispatch,dispatched"/>
+                        <br/>
+                        <field name="x_Sale_Order_Scheduled_State" widget="statusbar"
+                               statusbar_visible="none,NotScheduled,Scheduled,,,,"/>
+                        <br/>
+                        <field name="x_Sale_Order_First_Call_State" widget="statusbar"
+                               statusbar_visible="none,firstCall,secondCall,thirdCall,fourthCall,,"/>
+                        <br/>
+                        <field name="x_Sale_Order_First_OFD_State" widget="statusbar"
+                               statusbar_visible="none,firstOfd,firstRto,secondOfd,onHold,readyToDispatchToSender,inTransitBackToSender,returnToSender"/>
+                        <br/>
+                        <field name="x_Sale_Order_Delivered_State" widget="statusbar"
+                               statusbar_visible="none,delivered,notDelivered"/>
+                        <br/>
+                        <field name="x_Sale_Order_Req_For_Cancel_State" widget="statusbar"
+                               statusbar_visible="none,requestForCancel,readyToDispatch,cancelOrderInTransit,cancelOrderReturned"/>
+                    </div>
+                    <sheet>
+                        <div class="oe_button_box" name="button_box">
+                            <button name="action_view_invoice" type="object" class="oe_stat_button"
+                                    icon="fa-pencil-square-o" attrs="{'invisible': [('invoice_count', '=', 0)]}">
+                                <field name="invoice_count" widget="statinfo" string="Invoices"/>
+                            </button>
+                        </div>
+                        <div class="oe_title">
+                            <h1>
+                                Order Ref. #
+                                <field name="name" readonly="1"/>
+                                <field name="img_attach"/>
+                            </h1>
+                        </div>
+                        <div>
+                            <field name="img_QR"/>
+                        </div>
+                        <group>
+                            <group>
+                                <field name="partner_id" domain="[('customer','=',True)]"
+                                       context="{'search_default_customer':1, 'show_address': 1}"
+                                       options="{&quot;always_reload&quot;: True}"/>
+                                <field name="partner_invoice_id" groups="sale.group_delivery_invoice_address"
+                                       context="{'default_type':'invoice'}"/>
+                                <field name="partner_shipping_id" groups="sale.group_delivery_invoice_address"
+                                       context="{'default_type':'delivery'}"/>
+                                <field name="x_Sale_Order_Customer_name"/>
+                                <field name="x_Sale_order_Mobile_No"/>
+                                <field name="x_Sale_Order_Phone_Number"/>
+                                <field name="x_sale_order_shipping_address"/>
+                                <field name="x_Sale_Order_Cust_Comment"/>
+                            </group>
+                            <group>
+                                <field name="create_date"/>
+                                <field name="date_order"
+                                       attrs="{'invisible': [('state', 'in', ['sale', 'done', 'cancel'])]}"/>
+                                <field name="validity_date" attrs="{'invisible': [('state', 'in', ['sale', 'done'])]}"/>
+                                <field name="confirmation_date"
+                                       attrs="{'invisible': [('state', 'in', ['draft', 'sent', 'cancel'])]}"/>
+                                <field name="pricelist_id" groups="product.group_sale_pricelist"/>
+                                <field name="currency_id" invisible="1"/>
+                                <field name="payment_term_id" options="{'no_create': True}"/>
+                                <newline/>
+                                <!--<field name="x_Sale_Order_Cash" widget="monetary" on_change="sale_order_cash_on_delivery_OnChange(x_Sale_Order_Cash)" />-->
+                                <field name="x_Sale_Order_COD"/>
+                                <field name="x_Sale_Order_COD_Done"/>
+                                <field name="reversed_order"/>
+                                <field name="x_sale_order_driver_name"/>
+                                <field name="x_sale_order_picking_driver_name"/>
+                                <field name="x_Sale_Order_Cust_Prod"/>
+                            </group>
+                        </group>
+                        <notebook>
+                            <page string="Order Lines">
+                                <field name="order_line" mode="tree,kanban"
+                                       attrs="{'readonly': [('state', 'in', ('done','cancel'))]}">
+                                    <form string="Sales Order Lines">
+                                        <group>
+                                            <group>
+                                                <field name="product_id"
+                                                       context="{'partner_id':parent.partner_id, 'quantity':product_uom_qty, 'pricelist':parent.pricelist_id, 'uom':product_uom, 'company_id': parent.company_id}"
+                                                       attrs="{'readonly': ['|', ('qty_invoiced', '&gt;', 0)]}"/>
+                                                <!--<field name="layout_category_id" groups="sale.group_sale_layout"/>-->
+                                                <field name="invoice_status" invisible="1"/>
+                                                <field name="qty_to_invoice" invisible="1"/>
+                                                <!--<field name="qty_delivered_updateable" invisible="1"/>-->
+                                                <!--<field name="procurement_ids" invisible="1"/>-->
+                                                <field name="price_subtotal" invisible="1"/>
+                                                <label for="product_uom_qty" string="Ordered Quantity"/>
+                                                <div>
+                                                    <field context="{'partner_id':parent.partner_id, 'quantity':product_uom_qty, 'pricelist':parent.pricelist_id, 'uom':product_uom, 'uom_qty_change':True, 'company_id': parent.company_id}"
+                                                           name="product_uom_qty" class="oe_inline"/>
+                                                    <field name="product_uom" groups="product.group_uom"
+                                                           class="oe_inline oe_no_button"
+                                                           attrs="{'readonly': [('state', 'in', ('sale','done', 'cancel'))]}"/>
+                                                </div>
+                                                <label for="qty_delivered" string="Delivered Quantity"
+                                                       invisible="context.get('hide_sale')"/>
+                                                <div invisible="context.get('hide_sale')">
+                                                    <field name="qty_delivered"/>
+                                                </div>
+                                                <label for="qty_invoiced" string="Invoiced Quantity"
+                                                       invisible="context.get('hide_sale')"/>
+                                                <div invisible="context.get('hide_sale')">
+                                                    <field name="qty_invoiced" invisible="context.get('hide_sale')"/>
+                                                </div>
+                                                <field name="price_unit"/>
+                                                <label for="discount" groups="sale.group_discount_per_so_line"/>
+                                                <div name="discount" groups="sale.group_discount_per_so_line">
+                                                    <field name="discount" class="oe_inline"/>
+                                                    %
+                                                </div>
+                                            </group>
+                                            <group>
+                                                <field name="tax_id" widget="many2many_tags"
+                                                       domain="[('type_tax_use','=','sale'),('company_id','=',parent.company_id)]"
+                                                       attrs="{'readonly': [('qty_invoiced', '&gt;', 0)]}"/>
+                                                <label for="customer_lead"/>
+                                                <div>
+                                                    <field name="customer_lead" class="oe_inline"/>
+                                                    days
+                                                </div>
+                                                <label for="analytic_tag_ids"
+                                                       groups="analytic.group_analytic_accounting"/>
+                                                <div>
+                                                    <field name="analytic_tag_ids" widget="many2many_tags"
+                                                           groups="analytic.group_analytic_accounting"/>
+                                                </div>
+                                            </group>
+                                        </group>
+                                        <label for="name"/>
+                                        <field name="name"/>
+                                        <div groups="base.group_no_one">
+                                            <label for="invoice_lines"/>
+                                            <field name="invoice_lines"/>
+                                        </div>
+                                        <field name="state" invisible="1"/>
+                                    </form>
+                                    <tree string="Sales Order Lines" editable="bottom"
+                                          decoration-info="invoice_status=='to invoice'">
+                                        <field name="sequence" widget="handle"/>
+                                        <field name="product_id"
+                                               attrs="{'readonly': ['|', ('qty_invoiced', '&gt;', 0)]}"
+                                               context="{'partner_id':parent.partner_id, 'quantity':product_uom_qty, 'pricelist':parent.pricelist_id, 'uom':product_uom, 'company_id': parent.company_id}"/>
+                                        <!--<field name="layout_category_id" groups="sale.group_sale_layout"/>-->
+                                        <field name="name"/>
+                                        <field name="product_uom_qty" string="Ordered Qty"
+                                               context="{'partner_id':parent.partner_id, 'quantity':product_uom_qty, 'pricelist':parent.pricelist_id, 'uom':product_uom, 'company_id': parent.company_id}"/>
+                                        <field name="qty_delivered" invisible="context.get('hide_sale')"/>
+                                        <field name="qty_invoiced" invisible="context.get('hide_sale')"/>
+                                        <field name="qty_to_invoice" invisible="1"/>
+                                        <field name="product_uom"
+                                               attrs="{'readonly': [('state', 'in', ('sale','done', 'cancel'))]}"
+                                               context="{'company_id': parent.company_id}" groups="product.group_uom"
+                                               options="{&quot;no_open&quot;: True}"/>
+                                        <field name="analytic_tag_ids" groups="analytic.group_analytic_accounting"
+                                               widget="many2many_tags"/>
+                                        <field name="price_unit" attrs="{'readonly': [('qty_invoiced', '&gt;', 0)]}"/>
+                                        <field name="tax_id" widget="many2many_tags"
+                                               domain="[('type_tax_use','=','sale'),('company_id','=',parent.company_id)]"
+                                               attrs="{'readonly': [('qty_invoiced', '&gt;', 0)]}"/>
+                                        <field name="discount" groups="sale.group_discount_per_so_line"/>
+                                        <field name="price_subtotal" widget="monetary"
+                                               groups="sale.group_show_price_subtotal"/>
+                                        <field name="price_total" widget="monetary"
+                                               groups="sale.group_show_price_total"/>
+                                        <!--<field name="qty_delivered_updateable" invisible="1"/>-->
+                                        <!--<field name="procurement_ids" invisible="1"/>-->
+                                        <field name="state" invisible="1"/>
+                                        <field name="invoice_status" invisible="1"/>
+                                        <field name="customer_lead" invisible="1"/>
+                                        <field name="currency_id" invisible="1"/>
+                                    </tree>
+                                    <kanban class="o_kanban_mobile">
+                                        <field name="product_id"/>
+                                        <field name="product_uom_qty"/>
+                                        <field name="product_uom" groups="product.group_uom"/>
+                                        <field name="price_subtotal"/>
+                                        <templates>
+                                            <t t-name="kanban-box">
+                                                <div t-attf-class="oe_kanban_card oe_kanban_global_click">
+                                                    <div class="row">
+                                                        <div class="col-xs-12">
+                                                            <strong>
+                                                                <span>
+                                                                    <t t-esc="record.product_id.value"/>
+                                                                </span>
+                                                            </strong>
+                                                        </div>
+                                                    </div>
+                                                    <div class="row">
+                                                        <div class="col-xs-8 text-muted">
+                                                            <span>
+                                                                <t t-esc="record.product_uom_qty.value"/>
+                                                                <t t-esc="record.product_uom.value"/>
+                                                            </span>
+                                                        </div>
+                                                        <div class="col-xs-4 text-muted">
+                                                            <span class="pull-right text-right">
+                                                                <t t-esc="record.price_subtotal.value"/>
+                                                            </span>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </t>
+                                        </templates>
+                                    </kanban>
+                                </field>
+                                <group class="oe_subtotal_footer oe_right" colspan="2" name="sale_total">
+                                    <field name="x_Sale_Order_Cash" widget="monetary"
+                                           options="{'currency_field': 'currency_id'}"/>
+                                    <field name="order_fees_discount_percentage"/>
+                                    <field name="cod_fees_discount_percentage"/>
+                                    <field name="delivery_repriced" widget="monetary"
+                                           options="{'currency_field': 'currency_id'}"/>
+                                    <field name="cod_fees"/>
+                                    <field name="tax_repriced" widget="monetary"
+                                           options="{'currency_field': 'currency_id'}"/>
+                                    <field name="vat_tax"/>
+                                    <field name="amount_vat_tax"/>
+                                    <div class="oe_subtotal_footer_separator oe_inline o_td_label">
+                                        <label for="total_cash"/>
+                                        <button name="button_dummy" states="draft,sent" string="(update)" type="object"
+                                                class="oe_edit_only oe_link"/>
+                                    </div>
+                                    <field name="total_cash" nolabel="1" class="oe_subtotal_footer_separator"
+                                           widget="monetary" options="{'currency_field': 'currency_id'}"/>
+                                </group>
+                                <field name="note" class="oe_inline"
+                                       placeholder="Setup default terms and conditions in your company settings."/>
+                                <div class="oe_clear"/>
+                            </page>
+                            <page string="Other Information">
+                                <group>
+                                    <group string="Sales Information" name="sales_person">
+                                        <field name="user_id"/>
+                                        <field name="team_id" options="{'no_create': True}"/>
+                                        <field name="client_order_ref"/>
+                                        <field name="company_id" options="{'no_create': True}"
+                                               groups="base.group_multi_company"/>
+                                        <!--<field name="project_ids" attrs="{'invisible':[('state','=','sale')]}"
+                                               context="{'default_partner_id':partner_invoice_id, 'default_name':name}"
+                                               groups="analytic.group_analytic_accounting"/>-->
+                                        <!--<field name="related_project_id"
+                                               attrs="{'readonly': ['|',('project_ids','!=',False),('invoice_count','!=',0),('state','=','sale')],'invisible':[('state','!=','sale')]}"
+                                               context="{'default_partner_id':partner_invoice_id, 'default_name':name}"
+                                               groups="analytic.group_analytic_accounting"/>-->
+                                    </group>
+                                    <group name="sale_pay" string="Invoicing">
+                                        <field name="fiscal_position_id" options="{'no_create': True}"/>
+                                        <field name="invoice_status"
+                                               attrs="{'invisible': [('state', 'not in', ('sale','done'))]}"/>
+                                    </group>
+                                    <group string="Reporting" name="technical" groups="base.group_no_one">
+                                        <field groups="base.group_no_one" name="origin"/>
+                                    </group>
+                                </group>
+                            </page>
+                        </notebook>
+                    </sheet>
+                    <div class="oe_chatter">
+                        <field name="message_follower_ids" widget="mail_followers"/>
+                        <field name="activity_ids" widget="mail_activity"/>
+                        <field name="message_ids" widget="mail_thread"/>
+                    </div>
+                </form>
+            </field>
+        </record>
+
+
+        <!--<record model="ir.actions.act_window" id="action_portal_orders_all_graph">
+              <field name="name">Orders Dashboard</field>
+              <field name="type">ir.actions.act_window</field>
+              <field name="res_model">sale.order</field>
+              <field name="view_type">form</field>
+              <field name="view_mode">graph</field>
+            <field name="view_ids" eval="[(5, 0, 0),
+                                             (0, 0, {'view_mode': 'graph','view_id': ref('view_portal_orders_all_graph')})
+                                              ]"/>
+
+          </record>-->
+
+        <!--<record id="view_portal_orders_all_graph" model="ir.ui.view">
+          <field name="name">Orders Dashboard</field>
+          <field name="model">sale.order</field>
+          <field name="arch" type="xml">
+              <graph string="Orders Dashboard" type="bar">
+                  <field name="create_date" type="row"/>
+                  <field name="x_Sale_Order_Cash" type="measure"/>
+              </graph>
+          </field>
+        </record>-->
+
+        <!--<menuitem id="menu_client_orders_graph_dashbord_root" name="Client Orders Dashboards" sequence="50"/>
+        <menuitem id="menu_client_orders_graph_dashbord_orders" name="Orders" parent="menu_client_orders_root"  sequence="51"/>
+        <menuitem id="menu_client_orders_graph_dashbord_orders_all_orders" name="All Orders" parent="menu_client_orders_graph_dashbord_orders" action="action_portal_orders_all_graph" sequence="52"/>-->
+
+
+        <record model="ir.actions.act_window" id="action_invoiced_sales_orders_tree">
+            <field name="name">Invoiced Orders</field>
+            <field name="type">ir.actions.act_window</field>
+            <field name="res_model">sale.order</field>
+            <field name="view_type">form</field>
+            <field name="view_mode">tree,kanban,form,calendar</field>
+            <!--<field name="context"></field>-->
+            <!--<field name="view_id" ref="crm_unassigned_call_center_sale_order" />-->
+            <field name="domain">[('invoice_status','=','invoiced')]</field>
+            <field name="view_ids" eval="[(5, 0, 0),
+                                           (0, 0, {'view_mode': 'tree','view_id': ref('invoiced_sales_orders_tree')}),
+                                           (0, 0, {'view_mode': 'form', 'view_id': ref('invoiced_sales_orders_form')})
+                                            ]"/>
+
+        </record>
+
+        <record model="ir.actions.act_window" id="action_sales_orders_quotation_custom">
+            <field name="name">Quotation</field>
+            <field name="type">ir.actions.act_window</field>
+            <field name="res_model">sale.order</field>
+            <field name="view_type">form</field>
+            <field name="view_mode">tree,kanban,form,calendar,pivot,graph</field>
+            <!--<field name="context"></field>-->
+            <!--<field name="view_id" ref="crm_unassigned_call_center_sale_order" />-->
+            <field name="domain">[('state','=','draft')]</field>
+            <field name="view_ids" eval="[(5, 0, 0),
+                                           (0, 0, {'view_mode': 'tree','view_id': ref('view_quotation_sales_orders_tree')}),
+                                           (0, 0, {'view_mode': 'form', 'view_id': ref('sales_orders_quotation_custom_form')})
+                                            ]"/>
+
+        </record>
+
+        <record model="ir.actions.act_window" id="action_sales_orders_sales_orders_custom">
+            <field name="name">Sales Orders</field>
+            <field name="type">ir.actions.act_window</field>
+            <field name="res_model">sale.order</field>
+            <field name="view_type">form</field>
+            <field name="view_mode">tree,kanban,form,calendar,pivot,graph</field>
+            <!--<field name="context"></field>-->
+            <!--<field name="view_id" ref="crm_unassigned_call_center_sale_order" />-->
+            <field name="domain">[('state', '=', 'sale'),('invoice_status','=','to invoice')]</field>
+            <field name="view_ids" eval="[(5, 0, 0),
+                                           (0, 0, {'view_mode': 'tree','view_id': ref('view_sales_orders_sales_orders_tree')}),
+                                           (0, 0, {'view_mode': 'form', 'view_id': ref('sales_orders_view_custom_form')})
+                                            ]"/>
+
+        </record>
+
+        <!-- parent="sales_team.menu_base_partner" -->
+        <menuitem id="menu_sales_orders" name="Orders" sequence="4"/>
+        <menuitem id="menu_sales_orders_quotation_SalesOrders" name="Quotations Orders" parent="menu_sales_orders"
+                  action="action_sales_orders_quotation_custom" sequence="11"/>
+        <menuitem id="menu_sales_orders_sales_orders_SalesOrders" name="Sales Orders" parent="menu_sales_orders"
+                  action="action_sales_orders_sales_orders_custom" sequence="12"/>
+        <menuitem id="menu_sales_orders_invoiced_SalesOrders" name="Invoiced Orders" parent="menu_sales_orders"
+                  action="action_invoiced_sales_orders_tree" sequence="13"/>
+
+
+        <menuitem id="menu_accounting_finance_FLHeader" name="Finance" parent="account.menu_finance" sequence="2"/>
+        <menuitem id="menu_accounting_finance_couriers" name="Couriers" parent="menu_accounting_finance_FLHeader"
+                  action="action_courier_COD_recieved_sale_order" sequence="301"/>
+
+        <menuitem id="menu_accounting_invoices_FLHeader" name="Invoices" parent="account.menu_finance" sequence="3"/>
+        <menuitem id="menu_accounting_invoices_all_invoices" name="All Invoices"
+                  parent="menu_accounting_invoices_FLHeader" action="action_account_invoice_sale_all" sequence="303"/>
+        <menuitem id="menu_accounting_invoices_all_invoices_orders" name="All Invoices Orders"
+                  parent="menu_accounting_invoices_FLHeader" action="action_invoice_ordrs_tree" sequence="304"/>
+
+
+        <record id="view_res_users_custom" model="ir.ui.view">
+            <field name="name">res.users.custom.form.inherited</field>
+            <field name="model">res.users</field>
+            <field name="inherit_id" ref="base.view_users_form"/>
+            <field name="arch" type="xml">
+                <xpath expr="//group/field[@name='partner_id']" position="after">
+                    <field name="x_client_portal_user"/>
+                    <field name="x_is_courier"/>
+                </xpath>
+            </field>
+        </record>
+
+
+        <report
+                id="account_sale_invoice"
+                model="account.sale.invoice"
+                string="Client Orders Invoice"
+                report_type="qweb-pdf"
+                name="sale_extend_addon.report_order_invoice"
+                file="sale_extend_addon.report_order_invoice"
+        />
+
+
+        <template id="report_order_invoice_document">
+            <t t-call="report.external_layout">
+                <t t-set="doc" t-value="doc.with_context({'lang':doc.partner_id.lang})"/>
+                <div class="page">
+                    <div class="row">
+                        <div name="invoice_address" class="col-xs-5 col-xs-offset-7">
+                            <address t-field="doc.partner_id"
+                                     t-options="{&quot;widget&quot;: &quot;contact&quot;, &quot;fields&quot;:
+                                     [&quot;address&quot;, &quot;name&quot;], &quot;no_marker&quot;: True}"/>
+                        </div>
+                    </div>
+
+                    <h2>
+                        <span>Invoice</span>
+                        <span t-field="doc.invoice_number"/>
+                    </h2>
+
+                    <div class="row mt32 mb32">
+
+                        <div class="col-xs-4" t-if="doc.create_date">
+                            <strong>Invoice Date:</strong>
+                            <p t-field="doc.create_date"/>
+                        </div>
+                    </div>
+                    <!-- DO NOT REMOVE THIS TABLE. MANDATORY IN SOME COUNTRIES -->
+                    <div class="row">
+                        <div class="col-xs-6">
+                            <table class="table table-condensed">
+                                <tr class="border-black">
+                                    <td>
+                                        <strong>Invoice Number</strong>
+                                    </td>
+                                    <td class="text-right">
+                                        <span t-field="doc.invoice_count"/>
+                                    </td>
+                                </tr>
+                                <tr class="border-black">
+                                    <td>Total Orders Fees</td>
+                                    <td class="text-right">
+                                        <span t-field="doc.amount_vat_tax_total"/>
+                                    </td>
+                                </tr>
+                                <tr class="border-black">
+                                    <td>Total COD Fees</td>
+                                    <td class="text-right">
+                                        <span t-field="doc.cod_fees_total"/>
+                                    </td>
+                                </tr>
+                                <tr class="border-black">
+                                    <td>Total 10% Tax</td>
+                                    <td class="text-right">
+                                        <span t-field="doc.order_tax_total"/>
+                                    </td>
+                                </tr>
+                                <tr class="border-black">
+                                    <td>Total VAT Tax</td>
+                                    <td class="text-right">
+                                        <span t-field="doc.vat_tax_total"/>
+                                    </td>
+                                </tr>
+                                <tr class="border-black">
+                                    <td>Total Cash On Delivery</td>
+                                    <td class="text-right">
+                                        <span t-field="doc.order_cash_total"/>
+                                    </td>
+                                </tr>
+                                <tr class="border-black">
+                                    <td>
+                                        <strong>Total Paid Amount</strong>
+                                    </td>
+                                    <td class="text-right">
+                                        <span t-field="doc.paid_amount_total"/>
+                                    </td>
+                                </tr>
+                            </table>
+                        </div>
+                    </div>
+                    <!--<div class="row">
+                        <div class="col-xs-12">
+                            <table class="table table-condensed">
+                                <thead>
+                                    <tr>
+                                        <th>Invoice Count</th>
+                                        <th>Total COD Fees</th>
+                                        <th>Total Orders Charges</th>
+                                        <th>Total 10% Tax</th>
+                                        <th>Total VAT Tax</th>
+                                        <th class="text-right">Total Cash On Delivery</th>
+                                        <th class="text-right">Total Paid Amount</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                        <td><span t-field="doc.invoice_count"/></td>
+                                        <td><span t-field="doc.cod_fees_total"/></td>
+                                        <td><span t-field="doc.amount_vat_tax_total"/></td>
+                                        <td><span t-field="doc.order_tax_total"/></td>
+                                        <td><span t-field="doc.vat_tax_total"/></td>
+                                        <td class="text-right">
+                                            <span t-field="doc.order_cash_total" />
+                                        </td>
+                                        <td class="text-right">
+                                            <span t-field="doc.paid_amount_total" />
+                                        </td>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>-->
+
+                    <table class="table table-condensed">
+                        <thead>
+                            <tr>
+                                <th>Invoice Number</th>
+                                <!--<th class="hidden">Source Document</th>-->
+                                <th class="text-left">Order ref.</th>
+                                <th class="text-left">Amount Including Vat</th>
+                                <th class="text-left">VAT</th>
+                                <th class="text-left">Tax 10%</th>
+                                <th class="text-left">COD Fees</th>
+                                <th class="text-left">Total Amount</th>
+                                <th class="text-left">Cash On Delivery</th>
+                                <th class="text-left">Paid Amount</th>
+                                <!--<th t-if="display_discount" class="text-right">Disc.(%)</th>
+                                <th class="text-right">Taxes</th>
+                                <th class="text-right">Tax Excluded Price</th>-->
+                            </tr>
+                        </thead>
+                        <tbody class="invoice_tbody">
+                            <tr t-foreach="doc.invoice_orders" t-as="l">
+                                <td>
+                                    <span t-field="l.invoice_number"/>
+                                </td>
+                                <!--<td class="hidden"><span t-field="l.origin"/></td>-->
+                                <td class="text-left">
+                                    <span t-field="l.order_ref"/>
+                                    <!--<span t-field="l.uom_id" groups="product.group_uom"/>-->
+                                </td>
+                                <td class="text-left">
+                                    <span t-field="l.amount_vat_tax"/>
+                                </td>
+                                <td class="text-left">
+                                    <span t-field="l.vat_tax"/>
+                                </td>
+                                <td class="text-left">
+                                    <span t-field="l.order_tax"/>
+                                </td>
+                                <td class="text-left">
+                                    <span t-field="l.cod_fees"/>
+                                </td>
+                                <td class="text-left">
+                                    <span t-field="l.amount_total"/>
+                                </td>
+                                <td class="text-left">
+                                    <span t-field="l.order_cash"/>
+                                </td>
+                                <td class="text-left">
+                                    <span t-field="l.paid_amount"/>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+
+                    <div class="row">
+                        <div class="col-xs-4 pull-right">
+                            <table class="table table-condensed">
+                                <tr class="border-black">
+                                    <td>
+                                        <strong>Total Orders Cash</strong>
+                                    </td>
+                                    <td class="text-right">
+                                        <span t-field="doc.order_cash_total"/>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>
+                                        <span>Total Taxes</span>
+                                    </td>
+                                    <td class="text-right">
+                                        <span t-esc="doc.vat_tax_total+doc.order_tax_total"/>
+                                    </td>
+                                </tr>
+                                <tr class="border-black">
+                                    <td>
+                                        <strong>Total paid Amount</strong>
+                                    </td>
+                                    <td class="text-right">
+                                        <span t-field="doc.paid_amount_total"/>
+                                    </td>
+                                </tr>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </t>
+        </template>
+
+        <template id="report_order_invoice">
+            <t t-call="report.html_container">
+                <t t-foreach="docs" t-as="doc">
+                    <t t-call="sale_extend_addon.report_order_invoice_document" t-lang="doc.partner_id.lang"/>
+                </t>
+            </t>
+        </template>
+
+
+        <!--<record model="ir.ui.view" id="portal_create_manual_sales_orders_form">
+              <field name="name">portal.create.manual.sales.orders.form</field>
+              <field name="model">sale.order</field>
+              <field name="type">form</field>
+              <field name="arch" type="xml">
+                  <form string="Order" create="false" edit="true">
+                      <sheet>
+                          <field name="state" />
+                      </sheet>
+                      <notebook>
+                          <page string="Create Manual Orders">
+                               <field name="order_line" mode="tree">
+                                  <tree string="Client Orders" editable="bottom">
+                                      <field name="order_number" />
+                                      <field name="x_Sale_Order_Customer_name" />
+                                      <field name="x_Sale_order_Mobile_No" />
+                                      <field name="x_Sale_Order_Phone_Number" />
+                                      <field name="x_Sale_Order_Cust_Prod" />
+                                      <field name="product_id" />
+                                      <field name="x_sale_order_shipping_address" />
+                                      <field name="x_Sale_Order_Cust_Comment" />
+                                      <field name="x_Sale_Order_COD" />
+                                      <field name="x_Sale_Order_Cash" />
+                                  </tree>
+                               </field>
+                               <div class="oe_clear"/>
+                           </page>
+                      </notebook>
+                  </form>
+              </field>
+          </record>
+
+
+          <record model="ir.actions.act_window" id="action_portal_create_manual_sales_orders_form">
+              <field name="name">Create Manual Orders</field>
+              <field name="type">ir.actions.act_window</field>
+              <field name="res_model">sale.order</field>
+              <field name="view_type">form</field>
+              <field name="view_mode">form</field>
+              <field name="view_ids" eval="[(5, 0, 0),
+                                             (0, 0, {'view_mode': 'form', 'view_id': ref('portal_create_manual_sales_orders_form')})
+                                              ]"/>
+
+          </record>-->
+
+        <!-- <record model="ir.ui.view" id="operation_sale_orders_form">
+               <field name="name">operation.sale.orders.form</field>
+               <field name="model">operation.sale.order</field>
+               <field name="type">form</field>
+               <field name="arch" type="xml">
+                   <form string="Sales Orders Operations" create="true" edit="true">
+                       <header>
+                       </header>
+                       <sheet>
+                           <div class="oe_title">
+                           <h1>
+                               Sales Orders Operations
+                           </h1>
+                       </div>
+                       <group>
+                           <group>
+                               <field name="sale_orders" />
+                               <field name="driver_name" />
+                               <field name="operation_status" />
+
+                           </group>p>
+                       </group>
+                       <notebook>
+                           <page string="Operations History">
+                               <group string="History">
+                                   <group>
+                                       <field name="write_uid" readonly="1"/>
+                                       <field name="write_date" readonly="1"/>
+                                   </group>
+                               </group>
+                           </page>
+                       </notebook>
+                       </sheet>
+                            <div class="oe_chatter">
+                               <field name="message_follower_ids" widget="mail_followers"/>
+                               <field name="message_ids" widget="mail_thread"/>
+                           </div>
+                   </form>
+               </field>
+           </record>
+
+         <record model="ir.actions.act_window" id="action_operation_sale_orders_form">
+               <field name="name">Sales Orders Operations</field>
+               <field name="type">ir.actions.act_window</field>
+               <field name="res_model">operation.sale.order</field>
+               <field name="view_type">form</field>
+               <field name="view_mode">form</field>
+               <field name="view_id" ref="operation_sale_orders_form" />
+           </record>-->
+
+
+        <!-- explicit list view definition -->
+        <!--
+        <record model="ir.ui.view" id="sale_extend_addon.list">
+          <field name="name">sale_extend_addon list</field>
+          <field name="model">sale_extend_addon.sale_extend_addon</field>
+          <field name="arch" type="xml">
+            <tree>
+              <field name="name"/>
+              <field name="value"/>
+              <field name="value2"/>
+            </tree>
+          </field>
+        </record>
+        -->
+
+        <!-- actions opening views on models -->
+        <!--
+        <record model="ir.actions.act_window" id="sale_extend_addon.action_window">
+          <field name="name">sale_extend_addon window</field>
+          <field name="res_model">sale_extend_addon.sale_extend_addon</field>
+          <field name="view_mode">tree,form</field>
+        </record>
+        -->
+
+        <!-- server action to the one above -->
+        <!--
+        <record model="ir.actions.server" id="sale_extend_addon.action_server">
+          <field name="name">sale_extend_addon server</field>
+          <field name="model_id" ref="model_sale_extend_addon_sale_extend_addon"/>
+          <field name="code">
+            action = {
+              "type": "ir.actions.act_window",
+              "view_mode": "tree,form",
+              "res_model": self._name,
+            }
+          </field>
+        </record>
+        -->
+
+        <!-- Top menu item -->
+        <!--
+        <menuitem name="sale_extend_addon" id="sale_extend_addon.menu_root"/>
+        -->
+        <!-- menu categories -->
+        <!--
+        <menuitem name="Menu 1" id="sale_extend_addon.menu_1" parent="sale_extend_addon.menu_root"/>
+        <menuitem name="Menu 2" id="sale_extend_addon.menu_2" parent="sale_extend_addon.menu_root"/>
+        -->
+        <!-- actions -->
+        <!--
+        <menuitem name="List" id="sale_extend_addon.menu_1_list" parent="sale_extend_addon.menu_1"
+                  action="sale_extend_addon.action_window"/>
+        <menuitem name="Server to list" id="sale_extend_addon" parent="sale_extend_addon.menu_2"
+                  action="sale_extend_addon.action_server"/>
+        -->
+    </data>
+</odoo>
